@@ -2,7 +2,6 @@
 Final Project for CS 225\
 Requirements:
  - Node 8+
- - Expo CLI
 
 ## Setup
 Use npm to install the Expo CLI command line utility:
