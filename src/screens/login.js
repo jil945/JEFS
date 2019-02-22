@@ -1,9 +1,9 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { 
     ActivityIndicator,
     AsyncStorage,
     Button,
-    StatusBar,
     Text, 
     View, 
 } from "react-native";
@@ -14,6 +14,11 @@ export default class LoginScreen extends React.Component {
     static navigationOptions = {
         title: "Please sign in",
     };
+    static propTypes = {
+        navigation: PropTypes.shape({
+            navigate: PropTypes.func.isRequired,
+        }).isRequired,
+    }
 
     constructor(props) {
         super(props);
@@ -38,8 +43,8 @@ export default class LoginScreen extends React.Component {
                 {this.state.loading ? (
                     <ActivityIndicator></ActivityIndicator> 
                 ) : (
-                    <Button title="Login"
-                            onPress={_signIn}></Button>
+                    <Button title="Login" 
+                        onPress={this._signIn}></Button>
                 )}
             </View>
         );
