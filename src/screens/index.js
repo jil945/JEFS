@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 import { createStackNavigator, createAppContainer, createSwitchNavigator } from "react-navigation";
 
 import HomeScreen from "./home";
-import LoginScreen from './login';
+import LoginScreen from "./login";
 
 const MainStack = createStackNavigator({
     Home: {

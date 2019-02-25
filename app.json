@@ -23,6 +23,7 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "bundleNameJEFS",
       "supportsTablet": true
     }
   }
