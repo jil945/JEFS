@@ -1,16 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { 
-    ActivityIndicator,
-    AsyncStorage,
     Button,
     Text, 
     View, 
 } from "react-native";
 
-import { Google } from "expo";
-
-import { auth } from "../constants";
+import Auth from "../util/auth";
 import S from "../styles";
 
 export default class LoginScreen extends React.Component {
@@ -32,27 +28,30 @@ export default class LoginScreen extends React.Component {
     }
 
     _signIn = async () => {
-        /* this.setState({loading: true});
-        await AsyncStorage.setItem(auth.token, "dummytext");
-        this.setState({loading: false}); */
-
         try {
-            let user = await Google.logInAsync({
-                clientId: auth.clientId,
-                scopes: ["openid", "profile"],
-            });
-            console.log(user);
+            this.setState({ loading: true });
+            await Auth.signIn();
+            this.setState({ loading: false });
+            this._mainPage();
         } catch (error) {
             console.log(error);
         }
-        
+    }
+
+    _mainPage = () => {
         this.props.navigation.navigate("Main");
+    }
+
+    componentWillMount = async () => {
+        if (await Auth.isSignedIn()) {
+            this._mainPage();
+        }
     }
     
     render() {
         return (
             <View style={S.container}>
-                <Text>Login Screen (Testing)</Text>
+                <Text>Login</Text>
                 <Button title="Google"
                     onPress={this._signIn}></Button>
             </View>

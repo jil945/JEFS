@@ -26,6 +26,7 @@
     "rules": {
         "no-unused-vars": ["warn", {"varsIgnorePattern": "^React$"}],
         "no-console": "warn",
+        "no-empty": ["error", {"allowEmptyCatch": true}], 
         "indent": ["error", 4],
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "double"],
