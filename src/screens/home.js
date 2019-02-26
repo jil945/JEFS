@@ -1,46 +1,56 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { AsyncStorage, View, Text, Button, Image } from "react-native";
+import { createBottomTabNavigator } from "react-navigation";
+import Icon from "react-native-vector-icons/Ionicons";
+import Day from "./day";
+import Explore from "./explore";
+import Week from "./week";
+import Goal from "./goal";
+import Settings from "./settings";
 
-import Auth from "../util/auth";
-
-export default class HomeScreen extends React.Component {
-    static propTypes = {
-        navigation: PropTypes.shape({
-            navigate: PropTypes.func.isRequired,
-        }).isRequired,
-    };
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            userInfo: {}
-        };
-    }
-
-    _signOut = async () => {
-        try {
-            await Auth.signOut();
-            this.props.navigation.navigate("Login");
-        } catch(e) {
-            console.log(e);
+export default createBottomTabNavigator({
+    Day: {
+        screen: Day,
+        navigationOptions:{
+            tabBarLabel:"Day",
+            tabBarIcon: ({ tintColor }) => (
+                <Icon name="ios-today" color={tintColor} size={24} />
+            )
+        },
+    },
+    Explore: {
+        screen: Explore,
+        navigationOptions: {
+            tabBarLabel: "Explore",
+            tabBarIcon: ({ tintColor}) => (
+                <Icon name="ios-search" color={tintColor} size={24} />
+            )
+        }
+    },
+    Week: {
+        screen: Week,
+        navigationOptions: {
+            tabBarLabel: "Week",
+            tabBarIcon: ({ tintColor }) => (
+                <Icon name="ios-calendar" color={tintColor} size={24} />
+            )
+        }
+    },
+    Goal: {
+        screen: Goal,
+        navigationOptions:{
+            tabBarLabel: "Goal",
+            tabBarIcon: ({ tintColor }) => (
+                <Icon name="ios-contact" color={tintColor} size={24} />
+            )
+        }
+    },
+    Settings: {
+        screen: Settings,
+        navigationOptions: {
+            tabBarLabel:"Settings",
+            tabBarIcon: ({ tintColor }) => (
+                <Icon name="ios-settings" color={tintColor} size={24} />
+            )
         }
     }
-
-    componentWillMount = async () => {
-        let userInfo = await Auth.getUserInfo();
-        console.log(userInfo);
-        this.setState({ userInfo });
-    }
-
-    render() {
-        return (
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                <Text>Home Screen</Text>
-                <Button title="Sign Out"
-                    onPress={this._signOut}></Button>
-            </View>
-        );
-    }
-}
+});

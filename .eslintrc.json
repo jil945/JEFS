@@ -1,6 +1,7 @@
 {
     "parser": "babel-eslint",
     "env": {
+        "node": true,
         "browser": true,
         "es6": true
     },
@@ -34,6 +35,8 @@
         "react/jsx-uses-react": "error",   
         "react/jsx-uses-vars": "error",
         "react/jsx-indent": [2, 4],
-        "react/jsx-indent-props": [2, 4]
+        "react/jsx-indent-props": [2, 4],
+        "react/display-name": "off",
+        "react/prop-types": "warn"
     }
 }
