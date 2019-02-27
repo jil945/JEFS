@@ -1,17 +1,29 @@
 import React from "react";
-import { createStackNavigator, createAppContainer, createSwitchNavigator } from "react-navigation";
+import { 
+    createAppContainer, 
+    createBottomTabNavigator,
+    createStackNavigator, 
+    createSwitchNavigator 
+} from "react-navigation";
 
-import HomeScreen from "./home";
-import LoginScreen from "./login";
+import Day from "./day";
+import Explore from "./explore";
+import Week from "./week";
+import Goal from "./goal";
+import Settings from "./settings";
 
-const MainStack = createStackNavigator({
-    Home: {
-        screen: HomeScreen
-    },
-    initialRouteName: "Home"
+import Login from "./login";
+
+const MainStack = createBottomTabNavigator({
+    Day: Day,
+    Explore: Explore,
+    Week: Week,
+    Goal: Goal,
+    Settings: Settings,
 });
+
 const LoginStack = createStackNavigator({
-    Login: LoginScreen
+    Login: Login
 });
 
 const AppContainer = createAppContainer(createSwitchNavigator(

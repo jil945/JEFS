@@ -25,17 +25,19 @@
         }
     },
     "rules": {
+        "curly": ["error", "all"],
+        "brace-style": ["error", "1tbs"],
         "no-unused-vars": ["warn", {"varsIgnorePattern": "^React$"}],
         "no-console": "warn",
         "no-empty": ["error", {"allowEmptyCatch": true}], 
         "indent": ["error", 4],
-        "linebreak-style": ["error", "unix"],
+        "linebreak-style": "off",
         "quotes": ["error", "double"],
         "semi": ["error", "always"],
         "react/jsx-uses-react": "error",   
         "react/jsx-uses-vars": "error",
-        "react/jsx-indent": [2, 4],
-        "react/jsx-indent-props": [2, 4],
+        "react/jsx-indent": ["error", 4],
+        "react/jsx-indent-props": ["error", 4],
         "react/display-name": "off",
         "react/prop-types": "warn"
     }

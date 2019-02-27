@@ -9,7 +9,7 @@ import {
 import Auth from "../util/auth";
 import S from "../styles";
 
-export default class LoginScreen extends React.Component {
+export default class Login extends React.Component {
     static navigationOptions = {
         title: "Please sign in",
     };
@@ -43,7 +43,7 @@ export default class LoginScreen extends React.Component {
     }
 
     componentWillMount = async () => {
-        if (await Auth.isSignedIn()) {
+        if (await Auth.trySigningIn()) {
             this._mainPage();
         }
     }

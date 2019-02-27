@@ -2,40 +2,47 @@ import React from "react";
 import PropTypes from "prop-types";
 import { View, Text, Button, SafeAreaView, TextInput, Platform, StatusBar, ScrollView, Image, Dimensions } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import Category from "./components/Explore/category";
-import Recommendations from "./components/Explore/recommendations";
+
+import Category from "./components/explore/category";
+import Recommendations from "./components/explore/recommendations";
 
 const { height, width } = Dimensions.get("window");
 
 export default class Explore extends React.Component {
+    static navigationOptions = {
+        tabBarIcon: ({ tintColor }) => (
+            <Icon name="ios-search" color={tintColor} size={24}></Icon>
+        )
+    };
 	
     componentWillMount(){
-        this.startHeaderHeight = 80;
-        if(Platform.OS == "android"){
+        /* this.startHeaderHeight = 80;
+        if (Platform.OS == "android") {
             this.startHeaderHeight = 100 + StatusBar.currentHeight;
-        }
+        } */
     }
+    
     render() {
+        const headerHeight = Platform.OS  === "android" ? 100 + StatusBar.currentHeight : 80;
         return (
-            <SafeAreaView style={{ flex: 1}}>
+            <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1}}>
-                    <View style={{ height: this.startHeaderHeight, backgroundColor: "white", borderBottomWidth: 1, borderBottomColor: "#dddddd" }}>
+                    <View style={{ height: headerHeight, backgroundColor: "white", borderBottomWidth: 1, borderBottomColor: "#dddddd", paddingTop: 10 }}>
                         <View style={{
                             flexDirection: "row", padding: 10,
                             backgroundColor: "white", marginHorizontal: 20,
-                            shadowOffset: {width: 0, height: 0 },
+                            shadowOffset: { width: 0, height: 0 },
                             shadowColor: "black",
                             shadowOpacity: 0.2,
                             elevation: 1,
-                            marginTop:Platform.OS == "android" ? 30 : null }}>
+                            marginTop: Platform.OS == "android" ? 30 : null }}>
                             <Icon name="ios-search" size={20} style={{
                                 marginRight: 10}} />
                             <TextInput
                                 underlineColorAndroid="transparent"
                                 placeholder="Search for meals or workouts"
                                 placeholderTextColor="grey"
-                                style={{ flex: 1, fontWeight: "700",
-                                    backgroundColor: "white"}}></TextInput>
+                                style={{ flex: 1, fontWeight: "700", backgroundColor: "white"}}></TextInput>
                         </View>
                     </View>
                     <ScrollView scrollEventThrottle={16}>
@@ -48,8 +55,7 @@ export default class Explore extends React.Component {
                             <View style={{height:130, marginTop: 20}}>
                                 <ScrollView
                                     horizontal={true}
-                                    showsHorizontalScrollIndicator={false}		
-                                >
+                                    showsHorizontalScrollIndicator={false}>
                                     <Category imageUri={require("../../assets/food.jpg")}
                                         name="Meals"/>
                                     <Category imageUri={require("../../assets/exercise.jpg")}

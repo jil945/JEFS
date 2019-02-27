@@ -1,10 +1,23 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { View, Text, Button } from "react-native";
+import { View, SafeAreaView, Text, Button } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 
 import Auth from "../util/auth";
+import S from "../styles";
 
 export default class Settings extends React.Component {
+    static navigationOptions = {
+        tabBarIcon: ({ tintColor }) => (
+            <Icon name="ios-settings" color={tintColor} size={24}></Icon>
+        )
+    };
+    static propTypes = {
+        navigation: PropTypes.shape({
+            navigate: PropTypes.func.isRequired,
+        }).isRequired,
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -28,11 +41,11 @@ export default class Settings extends React.Component {
 
     render() {
         return (
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <SafeAreaView style={S.container}>
                 <Text>Settings</Text>
                 <Button title="Log Out"
                     onPress={this._signOut}></Button>
-            </View>
+            </SafeAreaView>
         );
     }
 }
