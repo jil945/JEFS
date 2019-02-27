@@ -1,6 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { View, SafeAreaView, Text, Button } from "react-native";
+import { 
+    AsyncStorage, 
+    Button,
+    SafeAreaView, 
+    Text, 
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import Auth from "../util/auth";
@@ -27,6 +32,15 @@ export default class Settings extends React.Component {
 
     _signOut = async () => {
         await Auth.signOut();
+        this._loginPage();
+    }
+
+    _clearCache = async () => {
+        await AsyncStorage.clear();
+        await this._signOut();
+    }
+
+    _loginPage = () => {
         this.props.navigation.navigate("Login");
     }
 
@@ -35,8 +49,7 @@ export default class Settings extends React.Component {
             let userInfo = await Auth.getUserInfo();
             this.setState({ userInfo });
             console.log(userInfo);
-        } catch(e) {
-        }
+        } catch(e) {}
     }
 
     render() {
@@ -45,6 +58,8 @@ export default class Settings extends React.Component {
                 <Text>Settings</Text>
                 <Button title="Log Out"
                     onPress={this._signOut}></Button>
+                <Button title="Clear cache"
+                    onPress={this._clearCache}></Button>
             </SafeAreaView>
         );
     }

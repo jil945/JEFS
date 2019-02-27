@@ -1,6 +1,4 @@
 import React from "react";
-// import { StyleSheet } from "react-native";
-
 import AppContainer from "./screens";
 
 export default class App extends React.Component {
