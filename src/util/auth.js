@@ -3,7 +3,10 @@ import { AsyncStorage } from "react-native";
 import { AppAuth } from "expo-app-auth";
 import axios from "axios";
 
-const GoogleAuthState = "@JEFS:GoogleOathKey";
+import http from "./http";
+
+const GOOGLE_AUTH_STATE = "@JEFS:GoogleOathKey";
+const USER_PROFILE_KEY = "@JEFS:UserProfileKey";
 
 const GOOGLE_CONFIG = {
     issuer: "https://accounts.google.com",
@@ -31,7 +34,7 @@ const Auth = {
                 token: accessToken,
                 isClientIdProvided: true,
             });
-            await AsyncStorage.removeItem(GoogleAuthState);
+            await AsyncStorage.removeItem(GOOGLE_AUTH_STATE);
         } catch(e){
             console.log(e);
         }
@@ -39,7 +42,7 @@ const Auth = {
 
     async setAuthState(authState) {
         try {
-            await AsyncStorage.setItem(GoogleAuthState, JSON.stringify(authState));
+            await AsyncStorage.setItem(GOOGLE_AUTH_STATE, JSON.stringify(authState));
         } catch(e) {
             console.log(e);
         }
@@ -47,7 +50,7 @@ const Auth = {
 
     async getAuthState() {
         try {
-            let auth = JSON.parse(await AsyncStorage.getItem(GoogleAuthState));
+            let auth = JSON.parse(await AsyncStorage.getItem(GOOGLE_AUTH_STATE));
             if (auth && this.isExpired(auth)) {
                 auth = await AppAuth.refreshAsync(GOOGLE_CONFIG, auth.refreshToken);
                 await this.setAuthState(auth);
@@ -102,7 +105,87 @@ const Auth = {
             console.log(e);
         }
         return false;
-    }
+    },
+
+    async getUserProfileAsync() {
+        let data = {};
+        try {
+            let userToken = await this.getUserToken();
+            let googleResp = await axios.get("https://www.googleapis.com/userinfo/v2/me", {
+                headers: { Authorization: `Bearer ${userToken}`}
+            });
+            data = googleResp.data;
+
+            let userProfile = await http.get(__DEV__ ? "me" : "") // TODO
+                .catch(e => null);
+            
+            if (userProfile) {
+                Object.keys(userProfile.data).reduce((a, c) => {
+                    a[c] = userProfile.data[c];
+                    return a;
+                }, data);
+            }
+        } catch(e) {
+            console.log(e);
+        }
+        await this.setUserProfileStorage(data);
+        return data;
+    },
+
+    async checkProfileExistsAsync() {
+        try {
+            let resp = await http.get(__DEV__ ? "me" : ""); // TODO
+            return resp.status === 200;
+        } catch(e) {}
+        return false;
+    },
+
+    async createUserProfileAsync(profile) {
+        let resp;
+        try {
+            resp = await http.post(__DEV__ ? "me" : "", profile); // TODO
+
+            let oldProfile = await this.getUserProfileStorage();
+            if (oldProfile) {
+                Object.keys(profile).forEach(k => {
+                    oldProfile[k] = profile[k];
+                });
+                await this.setUserProfileStorage(oldProfile);
+            }
+            await this.setUserProfileStorage(profile);
+        } catch(e) {}
+        return resp;
+    },
+
+    async updateUserProfileAsync(profile) {
+        let resp;
+        try {
+            resp = await http.put(__DEV__ ? "me" : "", profile); // TODO
+
+            let oldProfile = await this.getUserProfileStorage();
+            if (oldProfile) {
+                Object.keys(profile).forEach(k => {
+                    oldProfile[k] = profile[k];
+                });
+                await this.setUserProfileStorage(oldProfile);
+            }
+            await this.setUserProfileStorage(profile);
+        } catch(e) {}
+        return resp;
+    },
+
+    async setUserProfileStorage(profile) {
+        try {
+            await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+        } catch(e) {}
+    },
+
+    async getUserProfileStorage() {
+        try {
+            return JSON.parse(await AsyncStorage.getItem(USER_PROFILE_KEY));
+        } catch(e){}
+        return null;
+    },
 };
 
 export default Auth;
