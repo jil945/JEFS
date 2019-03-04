@@ -24,6 +24,9 @@
             "version": "detect"
         }
     },
+    "globals": {
+        "__DEV__": "readonly"
+    },
     "rules": {
         "curly": ["error", "all"],
         "brace-style": ["error", "1tbs"],

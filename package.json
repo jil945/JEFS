@@ -5,7 +5,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "prestart": "eslint --fix ./src/"
+    "prestart": "eslint --fix ."
   },
   "dependencies": {
     "axios": "^0.18.0",
