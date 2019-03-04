@@ -9,7 +9,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 
 import Auth from "../util/auth";
-import S from "../styles";
+import _s from "../styles";
 
 export default class Settings extends React.Component {
     static navigationOptions = {
@@ -54,7 +54,7 @@ export default class Settings extends React.Component {
 
     render() {
         return (
-            <SafeAreaView style={S.container}>
+            <SafeAreaView style={_s.container}>
                 <Text>Settings</Text>
                 <Button title="Log Out"
                     onPress={this._signOut}></Button>

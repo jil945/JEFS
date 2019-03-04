@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 
-const S = StyleSheet.create({
+const _s = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
@@ -9,4 +9,4 @@ const S = StyleSheet.create({
     }
 });
 
-export default S;
+export default _s;

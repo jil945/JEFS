@@ -81,7 +81,6 @@ const Auth = {
             if (!userToken) {
                 userToken = await this.getUserToken();
             }
-            console.log(userToken);
             let resp = await axios.get("https://www.googleapis.com/userinfo/v2/me", {
                 headers: { Authorization: `Bearer ${userToken}`}
             });
@@ -97,7 +96,7 @@ const Auth = {
     async trySigningIn() {
         try {
             let auth = await this.getAuthState();
-            console.log(auth);
+            // console.log(auth);
             return !!auth;
         } catch(e) {
             console.log(e);

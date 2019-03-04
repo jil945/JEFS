@@ -30,6 +30,7 @@
         "no-unused-vars": ["warn", {"varsIgnorePattern": "^React$"}],
         "no-console": "warn",
         "no-empty": ["error", {"allowEmptyCatch": true}], 
+        "newline-per-chained-call": "error",
         "indent": ["error", 4],
         "linebreak-style": "off",
         "quotes": ["error", "double"],

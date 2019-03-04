@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { View, SafeAreaView, Text, Button } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-import S from "../styles";
+import _s from "../styles";
 
 export default class Week extends React.Component {
     static navigationOptions = {
@@ -14,7 +14,7 @@ export default class Week extends React.Component {
 
     render() {
         return (
-            <SafeAreaView style={S.container}>
+            <SafeAreaView style={_s.container}>
                 <Text>Week</Text>
             </SafeAreaView>
         );
