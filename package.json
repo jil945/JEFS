@@ -15,9 +15,12 @@
     "prop-types": "^15.7.2",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
+    "react-native-chart-kit": "^2.2.1",
     "react-native-elements": "^1.1.0",
     "react-native-modal": "^9.0.0",
+    "react-native-pure-chart": "0.0.24",
     "react-native-settings-list": "^1.8.0",
+    "react-native-svg-charts": "^5.2.0",
     "react-navigation": "^3.3.0"
   },
   "devDependencies": {
