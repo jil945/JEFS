@@ -14,6 +14,8 @@ import Settings from "./settings";
 
 import Login from "./login";
 
+import Profile from "./profile";
+
 const MainStack = createBottomTabNavigator({
     Day: Day,
     Explore: Explore,
@@ -26,9 +28,13 @@ const LoginStack = createStackNavigator({
     Login: Login
 });
 
+const ProfileStack = createStackNavigator({
+    Profile: Profile
+});
 const AppContainer = createAppContainer(createSwitchNavigator(
     { 
         Main: MainStack,
+        Profile: ProfileStack,
         Login: LoginStack
     }, {
         initialRouteName: "Login"

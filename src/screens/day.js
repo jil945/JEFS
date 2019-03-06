@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { View, SafeAreaView, Text, Button } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { PieChart, BarChart, Grid, StackedBarChart } from "react-native-svg-charts";
-import PureChart from 'react-native-pure-chart';
+import { PieChart, BarChart, StackedBarChart } from "react-native-svg-charts";
+import PureChart from "react-native-pure-chart";
 
 export default class Day extends React.Component {
     static navigationOptions = {
@@ -30,63 +30,56 @@ export default class Day extends React.Component {
 
             return (
                 <View style={{ flex: 1}}>
-               		<PieChart
-                    style={{ height: 200 }}
-                    valueAccessor={({ item }) => item.amount}
-                    data={data}
-                    spacing={0}
-                    outerRadius={"95%"}>
-                	<Labels/>
-                	</PieChart>
-                	<View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
-                	<View style={{ flexDirection: 'row', height: 200, paddingVertical: 16 }}>
-                		<BarChart style={{ flex: 1 }}
-                    		data={barData} svg={{ fill: 'rgba(134, 65, 244, 0.8)' }}
-                    		contentInset={{ top: 10, bottom: 10 }}
-                    		spacing={0.2}
-                    		gridMin={0}>
-                    		<Grid direction={Grid.Direction.HORIZONTAL}/>
-                		</BarChart>
-            		</View>
+                    <PieChart
+                        style={{ height: 200 }}
+                        valueAccessor={({ item }) => item.amount}
+                        data={data}
+                        spacing={0}
+                        outerRadius={"95%"}>
+                        <Labels/>
+                    </PieChart>
+                    <View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
+                    <View style={{ flexDirection: "row", height: 200, paddingVertical: 16 }}>
+                        <BarChart style={{ flex: 1 }}
+                            data={barData} svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
+                            contentInset={{ top: 10, bottom: 10 }}>
+                        </BarChart>
+                    </View>
                 </View>
             );
         case 1:
             return (
                 <View style={{ flex: 1}}>
- 					<PureChart data={pieData} type='pie' />
- 					<View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
-                	<View style={{ flexDirection: 'row', height: 200, paddingVertical: 16 }}>
-            <StackedBarChart
-                style={ { height: 200 } }
-                keys={ keys }
-                colors={ colors }
-                data={ nutrientData }
-                contentInset={ { top: 30, bottom: 30 } }
-            />
-            		</View>
- 				</View>
+                    <PureChart data={pieData} type='pie' />
+                    <View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
+                        <StackedBarChart
+                            style={ { height: 200 } }
+                            keys={ keys }
+                            colors={ colors }
+                            data={ nutrientData }
+                            showGrid={ false }
+                            contentInset={ { top: 30, bottom: 30 } }
+                        />
+                </View>
             );
         case 2:
             return (
                 <View style={{ flex: 1}}>
-               		<PieChart
-                    style={{ height: 200 }}
-                    valueAccessor={({ item }) => item.amount}
-                    data={data}
-                    spacing={0}
-                    outerRadius={"95%"}>
-                	<Labels/>
-                	</PieChart>
-                	<View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
-                	<View style={{ flexDirection: 'row', height: 200, paddingVertical: 16 }}>
-                		<BarChart style={{ flex: 1 }}
-                    		data={barData} svg={{ fill: 'rgba(134, 65, 244, 0.8)' }}
-                    		contentInset={{ top: 10, bottom: 10 }}
-                    		spacing={0.2}
-                    		gridMin={0}>
-                    		<Grid direction={Grid.Direction.HORIZONTAL}/>
-                		</BarChart>
-            		</View>
+                    <PieChart
+                        style={{ height: 200 }}
+                        valueAccessor={({ item }) => item.amount}
+                        data={data}
+                        spacing={0}
+                        outerRadius={"95%"}>
+                        <Labels/>
+                    </PieChart>
+                    <View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
+                    <View style={{ flexDirection: "row", height: 200, paddingVertical: 16 }}>
+                        <BarChart style={{ flex: 1 }}
+                            data={barData} svg={{ fill: "rgba(134, 65, 244, 0.8)" }}
+                            contentInset={{ top: 10, bottom: 10 }}>
+                        </BarChart>
+                    </View>
                 </View>
             );
         default:
@@ -94,7 +87,7 @@ export default class Day extends React.Component {
         }
     }
     render() {
-                    const nutrientData = [
+        const nutrientData = [
             {
                 day: "Sunday",
                 fat: 30,
@@ -102,44 +95,44 @@ export default class Day extends React.Component {
                 protein: 20
             },
             {
-        day: "Monday",
+                day: "Monday",
                 fat: 40,
                 carb: 40,
                 protein: 20
             },
             {
-            day: "Tuesday",
+                day: "Tuesday",
                 fat: 45,
                 carb: 45,
                 protein: 10
             },
             {
-              day: "Wednesday",
+                day: "Wednesday",
                 fat: 40,
                 carb: 50,
                 protein: 10
             }
-        ]
-                const colors = [ "yellow", "green", "blue" ]
-        const keys   = [ "fat", "carb", "protein" ]
-            const barData = [ 10, 5, 25, 15, 20 ]
-          const pieData = [
-    {
-      value: 45,
-      label: 'Fat',
-      color: 'yellow',
-    }, {
-      value: 41,
-      label: 'Carb',
-      color: 'green'
-    }, {
-      value: 15,
-      label: 'Protein',
-      color: 'blue'
-    }
+        ];
+        const colors = [ "yellow", "green", "blue" ];
+        const keys   = [ "fat", "carb", "protein" ];
+        const barData = [ 10, 5, 25, 15, 20 ];
+        const pieData = [
+            {
+                value: 45,
+                label: "Fat",
+                color: "yellow",
+            }, {
+                value: 41,
+                label: "Carb",
+                color: "green"
+            }, {
+                value: 15,
+                label: "Protein",
+                color: "blue"
+            }
 
-  ]
-  const data = [
+        ];
+        const data = [
             {
                 key: 1,
                 amount: 80,
@@ -180,15 +173,13 @@ export default class Day extends React.Component {
         
         return (
             <SafeAreaView style={{ flex: 1 }}>
-            	<View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
-                    borderBottomColor: "#eae5e5", paddingTop: 20}}>
-                	<Icon name="ios-arrow-back" size={20}></Icon>
-                	<Icon name="ios-calendar" size={20}></Icon>
-                	<Text style={{fontSize:14, fontWeight:"700", paddingHorizontal: 20}}>
-                	Fri, Feb 08
-                    </Text>
+                <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
+                    borderBottomColor: "#eae5e5", paddingTop: 20, backgroundColor: "#cfdef7"}}>
+                    <Icon name="ios-arrow-back" size={20}></Icon>
+                    <Icon name="ios-calendar" size={20}></Icon>
+                    <Text style={{fontSize:14, fontWeight:"700"}}>Fri, Feb 08</Text>
                     <Icon name="ios-arrow-forward" size={20}></Icon>
-           		</View>
+                </View>
                 <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
                     borderBottomColor: "#eae5e5"}}>
                     <Button style={[this.state.activeIndex == 0 ? {} : {color:"grey"}]} 
