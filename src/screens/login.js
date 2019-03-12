@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { 
     ActivityIndicator,
-    Picker,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -14,15 +13,18 @@ import {
 import {
     CheckBox, Button
 } from "react-native-elements";
+import RNPickerSelect from "react-native-picker-select";
 
 import Auth from "../util/auth";
 import _s from "../styles";
 import { Tasks } from "../util/tasks";
 import GoogleSignInButton from "./components/GoogleSignInButton";
 
+const cuisineOptions = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle", "eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "european", "caribbean", "latin"];
+
 export default class Login extends React.Component {
     static navigationOptions = {
-        title: "Please sign in",
+        header: null 
     };
     static propTypes = {
         navigation: PropTypes.shape({
@@ -37,6 +39,7 @@ export default class Login extends React.Component {
             loading: false,
             newProfile: false,
             profile: {},
+            cuisineTypes: new Set()
         };
     }
 
@@ -55,16 +58,67 @@ export default class Login extends React.Component {
         
         await Tasks.init();
         let profile = await Auth.getUserProfileAsync();
-        console.log(profile);
+        // console.log(profile);
+        this.setState({ profile });
 
         // Check if profile is set
         let newProfile = !(await Auth.checkProfileExistsAsync());
         this.setState({ newProfile, loading: false });
+
+        if (!newProfile) {
+            this._mainPage();
+        }
     }
 
-    _submit = () => {
-        // TODO
-        this._mainPage();
+    _validateProfile = () => {
+        let p = this.state.profile;
+
+        // Check required keys
+        let requiredKeys = ["name", "weight", "height", "bmigoal", "gender", "age"];
+        let isReq = requiredKeys.every(k => !!p[k]);
+        if (!isReq) {
+            return false;
+        }
+
+        // Check positive numbers
+        let positiveNumbers = ["weight", "height", "bmigoal", "age"];
+        let isPositive = positiveNumbers.every(k => p[k] > 0);
+        if (!isPositive) {
+            return false;
+        }
+
+        // Check age is a number
+        if (!Number.isInteger(p.age)) {
+            return false;
+        }
+
+        // Check cuisinetypes is not empty
+        if (this.state.cuisineTypes.size <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    _submit = async () => {
+        console.log(this.state.profile);
+
+        if (!this._validateProfile()) {
+            return;
+        }
+        
+        let cuisine = [];
+        this.state.cuisineTypes.forEach(c => cuisine.push(c));
+
+        let profile = {
+            ...this.state.profile,
+            cuisine: cuisine
+        };
+
+        let resp = await Auth.createUserProfileAsync(profile);
+        if (resp.status === 200 || resp.status === 201) {
+            this._mainPage();
+        }
     }
 
     _mainPage = () => {
@@ -86,44 +140,42 @@ export default class Login extends React.Component {
             value: "n/a",
         }];
 
-        let pickerItmes = [];
-        for (let o of options) {
-            pickerItmes.push(<Picker.Item label={o.label} value={o.value} key={o.value}></Picker.Item>);
-        }
+        let placeholder = {
+            label: "Gender",
+            value: null
+        };
 
-        return <Picker>{pickerItmes}</Picker>;
+        return (
+            <RNPickerSelect 
+                placeholder={placeholder}
+                items={options}
+                value={this.state.profile.gender}
+                onValueChange={(val) => this.setState(state => {
+                    state.profile.gender = val;
+                    return state;
+                })}
+                style={pickerStyle}></RNPickerSelect>
+        );
     }
 
-    ethnicityPicker() {
-        let options = [{
-            label: "Asian",
-            value: "asian",
-        }, {
-            label: "Black/African",
-            value: "african",
-        }, {
-            label: "Caucasian",
-            value: "caucasian",
-        }, {
-            label: "Hispanic/Latino",
-            value: "hispanic",
-        }, {
-            label: "Native American",
-            value: "native",
-        }, {
-            label: "Pacific Islander",
-            value: "pacific",
-        }, {
-            label: "Prefer not to answer",
-            value: "n/a",
-        }];
-
-        let checkBoxes = [];
-        for (let o of options) {
-            checkBoxes.push(<CheckBox title={o.label} key={o.value}></CheckBox>);
-        }
-
-        return checkBoxes;
+    cuisinePicker() {
+        return cuisineOptions.map(c => {
+            let capitalized = c.charAt(0).toUpperCase() + c.slice(1);
+            let pressed = () => this.setState(state => {
+                if (state.cuisineTypes.has(c)) {
+                    state.cuisineTypes.delete(c);
+                } else {
+                    state.cuisineTypes.add(c);
+                }
+                return state.cuisineTypes;
+            });
+            return (
+                <CheckBox title={capitalized} 
+                    key={c}
+                    checked={this.state.cuisineTypes.has(c)}
+                    onPress={pressed}></CheckBox>
+            );
+        });
     }
 
     componentWillMount = async () => {
@@ -133,48 +185,77 @@ export default class Login extends React.Component {
             }
         } catch(e){}
     }
-    
-    renderView() {
-        if (this.state.loading) {
-            return <ActivityIndicator></ActivityIndicator>;
-        } else if (this.state.newProfile) {
-            return (
-                <ScrollView style={{ flex: 1 }}>
-                    <Text>New Profile</Text>
-                    <TextInput placeholder="Age" keyboardType="numeric"></TextInput>
-                    { this.genderPicker() }
-                    { this.ethnicityPicker() }
-                    <TextInput placeholder="Height (cm)" keyboardType="numeric"></TextInput>
-                    <TextInput placeholder="Weight (kg)" keyboardType="numeric"></TextInput>
-                    <Slider minimumValue={0} maximumValue={40}></Slider>
-                    <Button title="Submit" onPress={this._submit}></Button>
-                </ScrollView>
-            );
-        } else {
-            return <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>;
-        }
-    }
 
     render() {
         return (
-            <View style={_s.container}>
+            <SafeAreaView style={{ flex: 1}}>
                 { this.state.loading ? (
                     <ActivityIndicator></ActivityIndicator>
                 ) : this.state.newProfile ? (
-                    <ScrollView style={{ flex: 1 }}>
-                        <Text>New Profile</Text>
-                        <TextInput placeholder="Age" keyboardType="numeric"></TextInput>
-                        { this.genderPicker() }
-                        { this.ethnicityPicker() }
-                        <TextInput placeholder="Height (cm)" keyboardType="numeric"></TextInput>
-                        <TextInput placeholder="Weight (kg)" keyboardType="numeric"></TextInput>
-                        <Slider minimumValue={0} maximumValue={40}></Slider>
-                        <Button title="Submit" onPress={this._submit}></Button>
+                    <ScrollView>
+                        <View style={{ paddingHorizontal: 20}}>
+                            <Text>New Profile</Text>
+                            <TextInput placeholder="Age" 
+                                keyboardType="numeric"
+                                onChangeText={(text) => this.setState(state => {
+                                    state.profile.age = parseInt(text);
+                                    return state;
+                                })}></TextInput>
+                            { this.genderPicker() }
+                            <TextInput placeholder="Height (cm)" 
+                                keyboardType="numeric"
+                                onChangeText={(text) => this.setState(state => {
+                                    state.profile.height = parseFloat(text);
+                                    return state;
+                                })}></TextInput>
+                            <TextInput placeholder="Weight (kg)" 
+                                keyboardType="numeric"
+                                onChangeText={(text) => this.setState(state => {
+                                    state.profile.weight = parseFloat(text);
+                                    return state;
+                                })}></TextInput>
+                            <Slider minimumValue={0} 
+                                maximumValue={40} 
+                                onValueChange={(val) => this.setState(state => {
+                                    state.profile.bmigoal = parseFloat(val);
+                                    return state;
+                                })}></Slider>
+                            { this.cuisinePicker() }
+                            <Button style={{ paddingVertical: 12 }}
+                                title="Submit" 
+                                onPress={this._submit}></Button>
+
+                        </View>
                     </ScrollView>
                 ) : (
-                    <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>
+                    <View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
+                        <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>
+                    </View>
                 )}
-            </View>
+            </SafeAreaView>
         );
     }
 }
+
+const pickerStyle = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: "gray",
+        borderRadius: 4,
+        color: "black",
+        paddingRight: 30, // to ensure the text is never behind the icon
+    },
+    inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: "gray",
+        borderRadius: 8,
+        color: "black",
+        paddingRight: 30, // to ensure the text is never behind the icon
+    },
+});

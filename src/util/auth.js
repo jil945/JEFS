@@ -102,7 +102,7 @@ const Auth = {
             // console.log(auth);
             return !!auth;
         } catch(e) {
-            console.log(e);
+            console.log("Error", e);
         }
         return false;
     },
@@ -116,7 +116,7 @@ const Auth = {
             });
             data = googleResp.data;
 
-            let userProfile = await http.get(__DEV__ ? "me" : "") // TODO
+            let userProfile = await http.get("")
                 .catch(e => null);
             
             if (userProfile) {
@@ -134,16 +134,18 @@ const Auth = {
 
     async checkProfileExistsAsync() {
         try {
-            let resp = await http.get(__DEV__ ? "me" : ""); // TODO
+            let resp = await http.get("");
             return resp.status === 200;
-        } catch(e) {}
+        } catch(e) {
+            console.log(e);
+        }
         return false;
     },
 
     async createUserProfileAsync(profile) {
         let resp;
         try {
-            resp = await http.post(__DEV__ ? "me" : "", profile); // TODO
+            resp = await http.post("", profile);
 
             let oldProfile = await this.getUserProfileStorage();
             if (oldProfile) {
@@ -160,7 +162,7 @@ const Auth = {
     async updateUserProfileAsync(profile) {
         let resp;
         try {
-            resp = await http.put(__DEV__ ? "me" : "", profile); // TODO
+            resp = await http.put("", profile);
 
             let oldProfile = await this.getUserProfileStorage();
             if (oldProfile) {
