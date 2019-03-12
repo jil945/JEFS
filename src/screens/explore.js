@@ -1,6 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { View, Text, Button, SafeAreaView, TextInput, Platform, StatusBar, ScrollView, Image, Dimensions } from "react-native";
+import { View, Text, SafeAreaView, TextInput, Platform, StatusBar, ScrollView, Dimensions } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import Category from "./components/explore/category";

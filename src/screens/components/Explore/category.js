@@ -1,6 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { View, Text, Button, Image } from "react-native";
+import { View, Text, Image } from "react-native";
 
 export default class Category extends React.Component {
 

@@ -8,7 +8,6 @@ import {
 
 import Day from "./day";
 import Explore from "./explore";
-import Week from "./week";
 import Goal from "./goal";
 import Settings from "./settings";
 
@@ -19,7 +18,6 @@ import Profile from "./profile";
 const MainStack = createBottomTabNavigator({
     Day: Day,
     Explore: Explore,
-    Week: Week,
     Goal: Goal,
     Settings: Settings,
 });

@@ -1,10 +1,9 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { View, SafeAreaView, Text, Button } from "react-native";
-import { LineChart, Grid } from 'react-native-svg-charts'
+import { View, SafeAreaView, Text } from "react-native";
+import { LineChart, Grid, YAxis } from "react-native-svg-charts";
 import Icon from "react-native-vector-icons/Ionicons";
+import { Button } from "react-native-elements";
 
-import _s from "../styles";
 
 export default class Goal extends React.Component {
     static navigationOptions = {
@@ -17,21 +16,35 @@ export default class Goal extends React.Component {
         this.props.navigation.navigate("Profile");
     }
     render() {
-        const data = [ 122, 125, 131, 129, 126, 128, 125, 121 ]
+        const data = [ 122, 125, 131, 129, 126, 128, 125, 121 ];
 
         return (
-            <View style={{ flex: 1}}>
-            <View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1, paddingTop: 16}}></View>
-            <LineChart
-                style={{ height: 200 }}
-                data={ data }
-                svg={{ stroke: 'rgb(134, 65, 244)' }}
-                contentInset={{ top: 20, bottom: 20 }}
-            >
-            <Grid/>
-            </LineChart>
-            <Button title="Update Your Weight" style = {{ borderRadius:10}} onPress={this._updateWeight}></Button>
-            </View>
+            <SafeAreaView style={{ flex: 1 }}>
+                <Text style={{fontSize:24, fontWeight:"700", paddingHorizontal: 20, paddingTop: 60}}>
+					Weight Loss
+                </Text>
+                <View style={{ height: 200, flexDirection: "row", marginLeft: 40 }}>
+                    <YAxis
+                        data={ data }
+                        contentInset={ { top: 20, bottom: 20 } }
+                        svg={{
+                            fill: "grey",
+                            fontSize: 10,
+                        }}
+                        numberOfTicks={ 10 }
+                        formatLabel={ value => `${value}lb` }
+                    />
+                    <LineChart
+                        style={{ flex: 1, marginLeft: 16 }}
+                        data={ data }
+                        svg={{ stroke: "rgb(212, 227, 252)" , strokeWidth: 2}}
+                        contentInset={{ top: 20, bottom: 20 }}
+                    >
+                        <Grid/>
+                    </LineChart>
+                </View>
+                <Button title="Update Your Weight" style = {{borderRadius:10, justifyContent: "center", alignItems: "center"}} onPress={this._updateWeight}></Button>
+            </SafeAreaView>
         );
     }
 }
