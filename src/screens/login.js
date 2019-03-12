@@ -65,9 +65,10 @@ export default class Login extends React.Component {
         let newProfile = !(await Auth.checkProfileExistsAsync());
         this.setState({ newProfile, loading: false });
 
-        if (!newProfile) {
+        /* if (!newProfile) {
             this._mainPage();
-        }
+        } */
+        this._mainPage(); // TODO
     }
 
     _validateProfile = () => {
