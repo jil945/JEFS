@@ -27,7 +27,6 @@ export default class Day extends React.Component {
     _renderSection = (keys, colors, nutrientData, pieData, barData, data, Labels) => {
         switch (this.state.activeIndex) {
         case 0:
-
             return (
                 <View style={{ flex: 1}}>
                     <PieChart
@@ -52,14 +51,14 @@ export default class Day extends React.Component {
                 <View style={{ flex: 1}}>
                     <PureChart data={pieData} type='pie' />
                     <View style={{borderBottomColor: "#dddddd", borderBottomWidth: 1}}></View>
-                        <StackedBarChart
-                            style={ { height: 200 } }
-                            keys={ keys }
-                            colors={ colors }
-                            data={ nutrientData }
-                            showGrid={ false }
-                            contentInset={ { top: 30, bottom: 30 } }
-                        />
+                    <StackedBarChart
+                        style={ { height: 200 } }
+                        keys={ keys }
+                        colors={ colors }
+                        data={ nutrientData }
+                        showGrid={ false }
+                        contentInset={ { top: 30, bottom: 30 } }
+                    />
                 </View>
             );
         case 2:
