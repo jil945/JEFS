@@ -153,9 +153,12 @@ const Auth = {
                     oldProfile[k] = profile[k];
                 });
                 await this.setUserProfileStorage(oldProfile);
+            } else {
+                await this.setUserProfileStorage(profile);
             }
-            await this.setUserProfileStorage(profile);
-        } catch(e) {}
+        } catch(e) {
+            resp = e;
+        }
         return resp;
     },
 
@@ -170,9 +173,12 @@ const Auth = {
                     oldProfile[k] = profile[k];
                 });
                 await this.setUserProfileStorage(oldProfile);
+            } else {
+                await this.setUserProfileStorage(profile);
             }
-            await this.setUserProfileStorage(profile);
-        } catch(e) {}
+        } catch(e) {
+            resp = e;
+        }
         return resp;
     },
 

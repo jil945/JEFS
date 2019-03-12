@@ -11,7 +11,7 @@ import {
     View,
 } from "react-native";
 import {
-    CheckBox, Button
+    CheckBox, Button, Header
 } from "react-native-elements";
 import RNPickerSelect from "react-native-picker-select";
 
@@ -74,14 +74,14 @@ export default class Login extends React.Component {
         let p = this.state.profile;
 
         // Check required keys
-        let requiredKeys = ["name", "weight", "height", "bmigoal", "gender", "age"];
+        let requiredKeys = ["name", "weight", "height", "targetWeight", "gender", "age"];
         let isReq = requiredKeys.every(k => !!p[k]);
         if (!isReq) {
             return false;
         }
 
         // Check positive numbers
-        let positiveNumbers = ["weight", "height", "bmigoal", "age"];
+        let positiveNumbers = ["weight", "height", "targetWeight", "age"];
         let isPositive = positiveNumbers.every(k => p[k] > 0);
         if (!isPositive) {
             return false;
@@ -101,19 +101,24 @@ export default class Login extends React.Component {
     }
 
     _submit = async () => {
-        console.log(this.state.profile);
-
         if (!this._validateProfile()) {
             return;
         }
         
+        // Insert cuisine
         let cuisine = [];
         this.state.cuisineTypes.forEach(c => cuisine.push(c));
 
+        // Calculate BMI goal
+        let bmigoal = this.state.profile.targetWeight / Math.pow(this.state.profile.height, 2);
+
         let profile = {
             ...this.state.profile,
+            bmigoal: bmigoal,
             cuisine: cuisine
         };
+
+        console.log(profile);
 
         let resp = await Auth.createUserProfileAsync(profile);
         if (resp.status === 200 || resp.status === 201) {
@@ -188,50 +193,56 @@ export default class Login extends React.Component {
 
     render() {
         return (
-            <SafeAreaView style={{ flex: 1}}>
-                { this.state.loading ? (
-                    <ActivityIndicator></ActivityIndicator>
-                ) : this.state.newProfile ? (
-                    <ScrollView>
-                        <View style={{ paddingHorizontal: 20}}>
-                            <Text>New Profile</Text>
-                            <TextInput placeholder="Age" 
-                                keyboardType="numeric"
-                                onChangeText={(text) => this.setState(state => {
-                                    state.profile.age = parseInt(text);
-                                    return state;
-                                })}></TextInput>
-                            { this.genderPicker() }
-                            <TextInput placeholder="Height (cm)" 
-                                keyboardType="numeric"
-                                onChangeText={(text) => this.setState(state => {
-                                    state.profile.height = parseFloat(text);
-                                    return state;
-                                })}></TextInput>
-                            <TextInput placeholder="Weight (kg)" 
-                                keyboardType="numeric"
-                                onChangeText={(text) => this.setState(state => {
-                                    state.profile.weight = parseFloat(text);
-                                    return state;
-                                })}></TextInput>
-                            <Slider minimumValue={0} 
-                                maximumValue={40} 
-                                onValueChange={(val) => this.setState(state => {
-                                    state.profile.bmigoal = parseFloat(val);
-                                    return state;
-                                })}></Slider>
-                            { this.cuisinePicker() }
-                            <Button style={{ paddingVertical: 12 }}
-                                title="Submit" 
-                                onPress={this._submit}></Button>
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    <Header centerComponent={{
+                        text: this.state.newProfile ? "Create New Profile" : "Login",
+                        style: { color: "#fff", fontWeight: "bold" }
+                    }}></Header>
+                    { this.state.loading ? (
+                        <ActivityIndicator></ActivityIndicator>
+                    ) : this.state.newProfile ? (
+                        <ScrollView>
+                            <View style={{ paddingHorizontal: 20}}>
+                                <Text>New Profile</Text>
+                                <TextInput placeholder="Age" 
+                                    keyboardType="number-pad"
+                                    onChangeText={(text) => this.setState(state => {
+                                        state.profile.age = parseInt(text);
+                                        return state;
+                                    })}></TextInput>
+                                { this.genderPicker() }
+                                <TextInput placeholder="Height (cm)" 
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => this.setState(state => {
+                                        state.profile.height = parseFloat(text);
+                                        return state;
+                                    })}></TextInput>
+                                <TextInput placeholder="Weight (kg)" 
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => this.setState(state => {
+                                        state.profile.weight = parseFloat(text);
+                                        return state;
+                                    })}></TextInput>
+                                <TextInput placeholder="Target Weight (kg)"
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => this.setState(state => {
+                                        state.profile.targetWeight = parseFloat(text);
+                                        return state;
+                                    })}></TextInput>
+                                { this.cuisinePicker() }
+                                <Button style={{ paddingVertical: 12 }}
+                                    title="Submit" 
+                                    onPress={this._submit}></Button>
 
+                            </View>
+                        </ScrollView>
+                    ) : (
+                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
+                            <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>
                         </View>
-                    </ScrollView>
-                ) : (
-                    <View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
-                        <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>
-                    </View>
-                )}
+                    )}
+                </View>
             </SafeAreaView>
         );
     }
