@@ -4,6 +4,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { PieChart, StackedBarChart, XAxis } from "react-native-svg-charts";
 import PureChart from "react-native-pure-chart";
 import moment from "moment";
+
+const DATE_FORMAT = "MMM Do YY";
 export default class Day extends React.Component {
     static navigationOptions = {
         tabBarIcon: ({ tintColor }) => (
@@ -15,19 +17,21 @@ export default class Day extends React.Component {
         super(props);
         this.state = {
             activeIndex: 0,
-            currentDate: new Date().toDateString(),
+            currentDate: new moment(),
         };
     }
     _incrementDate = () => {
-        this.setState({
-            currentDate: moment(this.state.currentDate).add(1, "days")
+        this.setState(state => {
+            state.currentDate = state.currentDate.add(1, "days");
+            return state;
         });
     }
-  _decrementDate = () => {
-      this.setState({
-          currentDate: moment(this.state.currentDate).subtract(1, "days")
-      });
-  }
+    _decrementDate = () => {
+        this.setState(state => {
+            state.currentDate = state.currentDate.subtract(1, "days");
+            return state;
+        });
+    }
     _segmentClicked = (index) => {
         this.setState({
             activeIndex: index,
@@ -36,7 +40,6 @@ export default class Day extends React.Component {
     _renderSection = (nutrientData, colors, calColors, keys, barKeys, stepsColors, barData, pieData, calories, steps) => {
         switch (this.state.activeIndex) {
         case 0:
-
             return (
                 <View style={{ flex: 1, marginTop: 20}}>
                     <PieChart
@@ -251,9 +254,9 @@ export default class Day extends React.Component {
                 <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
                     borderBottomColor: "#eae5e5", margingTop: 40, paddingTop: 16, backgroundColor: "#cfdef7"}}>
                     <Icon name="ios-arrow-back" size={20} onPress={this._decrementDate}></Icon>
-                    <Icon name="ios-calendar" size={20} onPress={this._incrementDate}></Icon>
-                    <Text style={{fontSize:14}}>{this.state.currentDate}</Text>
-                    <Icon name="ios-arrow-forward" size={20}></Icon>
+                    <Icon name="ios-calendar" size={20}></Icon>
+                    <Text style={{fontSize:14}}>{this.state.currentDate.format(DATE_FORMAT)}</Text>
+                    <Icon name="ios-arrow-forward" size={20} onPress={this._incrementDate}></Icon>
                 </View>
                 <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
                     borderBottomColor: "#eae5e5"}}>
