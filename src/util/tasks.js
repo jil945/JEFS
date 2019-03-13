@@ -68,6 +68,35 @@ const PedometerTask = {
                 .catch(console.log); // no-op
             
         }
+    },
+
+    /**
+     * 
+     * @param {Date} currDate 
+     */
+    async getWeeklySteps(currDate) {
+        let weeklySteps = Array(7).fill({
+            steps: 0
+        });
+
+        let day = new Date(currDate);
+        day.setHours(23, 59, 59, 999);
+
+        if (await Pedometer.isAvailableAsync()) {
+            await Promise.all(weeklySteps.map((_, idx) => {
+                let end = new Date(day);
+                let start = new Date(day);
+                start.setDate(start.getDate() - 1);
+
+                day = start;
+
+                return Pedometer.getStepCountAsync(start, end)
+                    .then(({ steps }) => {
+                        weeklySteps[idx] = {steps, day: end};
+                    });
+            }));
+        }
+        return weeklySteps;
     }
 };
 

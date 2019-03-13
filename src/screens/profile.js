@@ -1,9 +1,9 @@
 import React from "react";
 import { View, SafeAreaView, Text, Button, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import moment from "moment";
+import DateHeader from "./components/DateHeader";
 
-const DATE_FORMAT = "MMM Do YY";
+import moment from "moment";
 
 export default class Profile extends React.Component {
     constructor(props) {
@@ -11,24 +11,9 @@ export default class Profile extends React.Component {
         this.state = { 
             text: "131 lb",
             currentDate: new moment(),
-        };//get value from state
+        };
     }
 
-    _incrementDate = () => {
-        this.setState(state => {
-            state.currentDate = state.currentDate.add(1, "days");
-            return state;
-        });
-    }
-    _decrementDate = () => {
-    /* this.setState({
-    currentDate: moment(this.state.currentDate).subtract(1, "days")
-    }); */
-        this.setState(state => {
-            state.currentDate = state.currentDate.subtract(1, "days");
-            return state;
-        });
-    }
     _cancel = () => {
     //TODO
         this.props.navigation.navigate("Goal");
@@ -46,13 +31,11 @@ export default class Profile extends React.Component {
                     <Text style={{fontSize:20, fontWeight:"700"}}>Weight</Text>
                     <Button title="Save" style = {{ borderRadius:10}} onPress={this._save}></Button>
                 </View>
-                <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
-                    borderBottomColor: "#eae5e5", paddingTop: 20}}>
-                    <Icon name="ios-arrow-back" size={20} onPress={this._decrementDate}></Icon>
-                    <Icon name="ios-calendar" size={20}></Icon>
-                    <Text style={{fontSize:14}}>{this.state.currentDate.format(DATE_FORMAT)}</Text>
-                    <Icon name="ios-arrow-forward" size={20} onPress={this._incrementDate}></Icon>
-                </View>
+                <DateHeader value={this.state.currentDate}
+                    onChange={(d) => this.setState(state => {
+                        state.currentDate = d;
+                        return state;
+                    })}></DateHeader>
                 <TextInput
                     style={{height: 40, borderColor: "gray", borderWidth: 1, justifyContent: "center", alignItems: "center"}}
                     keyboardType = 'numeric'
