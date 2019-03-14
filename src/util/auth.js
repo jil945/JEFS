@@ -143,6 +143,41 @@ const Auth = {
     },
 
     async createUserProfileAsync(profile) {
+        let fields = ["name", "weight", "height", "targetWeight", "gender", "age", "bmigoal", "cuisine"];
+        let tempProfile = fields.reduce((a, c) => {
+            a[c] = profile[c];
+            return a;
+        }, {});
+        profile = tempProfile;
+
+        let resp;
+        try {
+            resp = await http.put("", profile);
+            console.log(resp.data);
+
+            let oldProfile = await this.getUserProfileStorage();
+            if (oldProfile) {
+                Object.keys(profile).forEach(k => {
+                    oldProfile[k] = profile[k];
+                });
+                await this.setUserProfileStorage(oldProfile);
+            } else {
+                await this.setUserProfileStorage(profile);
+            }
+        } catch(error) {
+            if (error.response) {
+                resp = error.response;
+                console.log(error.response.status);
+                //console.log("error.response", error.response);
+            } else {
+                // console.log("error.request", error.request);
+                resp = {};
+            }
+        }
+        return resp;
+    },
+
+    async updateUserProfileAsync(profile) {
         let resp;
         try {
             resp = await http.post("", profile);
@@ -157,27 +192,11 @@ const Auth = {
                 await this.setUserProfileStorage(profile);
             }
         } catch(e) {
-            resp = e;
-        }
-        return resp;
-    },
-
-    async updateUserProfileAsync(profile) {
-        let resp;
-        try {
-            resp = await http.put("", profile);
-
-            let oldProfile = await this.getUserProfileStorage();
-            if (oldProfile) {
-                Object.keys(profile).forEach(k => {
-                    oldProfile[k] = profile[k];
-                });
-                await this.setUserProfileStorage(oldProfile);
+            if (e.response) {
+                resp = e.response;
             } else {
-                await this.setUserProfileStorage(profile);
+                resp = {};
             }
-        } catch(e) {
-            resp = e;
         }
         return resp;
     },

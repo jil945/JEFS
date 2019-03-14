@@ -5,13 +5,10 @@ import {
     SafeAreaView,
     ScrollView,
     StyleSheet,
-    Slider,
-    Text,
-    TextInput,
     View,
 } from "react-native";
 import {
-    CheckBox, Button, Header
+    Text, CheckBox, Button, Header, Input, Avatar
 } from "react-native-elements";
 import RNPickerSelect from "react-native-picker-select";
 
@@ -19,8 +16,6 @@ import Auth from "../util/auth";
 import _s from "../styles";
 import { Tasks } from "../util/tasks";
 import GoogleSignInButton from "./components/GoogleSignInButton";
-
-const cuisineOptions = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle", "eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "european", "caribbean", "latin"];
 
 export default class Login extends React.Component {
     static navigationOptions = {
@@ -65,10 +60,9 @@ export default class Login extends React.Component {
         let newProfile = !(await Auth.checkProfileExistsAsync());
         this.setState({ newProfile, loading: false });
 
-        /* if (!newProfile) {
+        if (!newProfile) {
             this._mainPage();
-        } */
-        this._mainPage(); // TODO
+        }
     }
 
     _validateProfile = () => {
@@ -118,10 +112,9 @@ export default class Login extends React.Component {
             bmigoal: bmigoal,
             cuisine: cuisine
         };
-
-        console.log(profile);
-
+        
         let resp = await Auth.createUserProfileAsync(profile);
+        // console.log(resp.data);
         if (resp.status === 200 || resp.status === 201) {
             this._mainPage();
         }
@@ -147,24 +140,30 @@ export default class Login extends React.Component {
         }];
 
         let placeholder = {
-            label: "Gender",
+            label: "",
             value: null
         };
 
         return (
-            <RNPickerSelect 
-                placeholder={placeholder}
-                items={options}
-                value={this.state.profile.gender}
-                onValueChange={(val) => this.setState(state => {
-                    state.profile.gender = val;
-                    return state;
-                })}
-                style={pickerStyle}></RNPickerSelect>
+            <View>
+                <Text style={{ color: "gray", fontSize: 20 }}>Gender</Text>
+                <RNPickerSelect 
+                    label="Gender"
+                    placeholder={placeholder}
+                    items={options}
+                    value={this.state.profile.gender}
+                    onValueChange={(val) => this.setState(state => {
+                        state.profile.gender = val;
+                        return state;
+                    })}
+                    style={pickerStyle}></RNPickerSelect>
+            </View>
         );
     }
 
     cuisinePicker() {
+        const cuisineOptions = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle", "eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "european", "caribbean", "latin"];
+
         return cuisineOptions.map(c => {
             let capitalized = c.charAt(0).toUpperCase() + c.slice(1);
             let pressed = () => this.setState(state => {
@@ -204,37 +203,40 @@ export default class Login extends React.Component {
                         <ActivityIndicator></ActivityIndicator>
                     ) : this.state.newProfile ? (
                         <ScrollView>
-                            <View style={{ paddingHorizontal: 20}}>
-                                <Text>New Profile</Text>
-                                <TextInput placeholder="Age" 
+                            <View style={{ padding: 20 }}>
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <Avatar source={{ uri: this.state.profile.picture }}></Avatar>
+                                </View>
+                                <Input label="Age" 
                                     keyboardType="number-pad"
                                     onChangeText={(text) => this.setState(state => {
                                         state.profile.age = parseInt(text);
                                         return state;
-                                    })}></TextInput>
+                                    })}></Input>
                                 { this.genderPicker() }
-                                <TextInput placeholder="Height (cm)" 
+                                <Input label="Height (cm)" 
                                     keyboardType="numeric"
                                     onChangeText={(text) => this.setState(state => {
                                         state.profile.height = parseFloat(text);
                                         return state;
-                                    })}></TextInput>
-                                <TextInput placeholder="Weight (kg)" 
+                                    })}></Input>
+                                <Input label="Weight (kg)" 
                                     keyboardType="numeric"
                                     onChangeText={(text) => this.setState(state => {
                                         state.profile.weight = parseFloat(text);
                                         return state;
-                                    })}></TextInput>
-                                <TextInput placeholder="Target Weight (kg)"
+                                    })}></Input>
+                                <Input label="Target Weight (kg)"
                                     keyboardType="numeric"
                                     onChangeText={(text) => this.setState(state => {
                                         state.profile.targetWeight = parseFloat(text);
                                         return state;
-                                    })}></TextInput>
+                                    })}></Input>
                                 { this.cuisinePicker() }
                                 <Button style={{ paddingVertical: 12 }}
                                     title="Submit" 
                                     onPress={this._submit}></Button>
+                                { __DEV__  && <Button style={{ padding: 12 }} title="Main Page" onPress={this._mainPage}></Button> }
 
                             </View>
                         </ScrollView>
