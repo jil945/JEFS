@@ -6,6 +6,8 @@ import { SearchBar } from "react-native-elements";
 import Category from "./components/explore/category";
 import Recommendations from "./components/explore/recommendations";
 
+import { GET_WORKOUT, GET_RECIPIE } from "../util/http";
+
 const { height, width } = Dimensions.get("window");
 
 export default class Explore extends React.Component {
@@ -35,11 +37,9 @@ export default class Explore extends React.Component {
         });
     }
 	
-    componentWillMount(){
-        /* this.startHeaderHeight = 80;
-        if (Platform.OS == "android") {
-            this.startHeaderHeight = 100 + StatusBar.currentHeight;
-        } */
+    componentWillMount = async () => {
+        let recipie = await GET_RECIPIE;
+        let workout = await GET_WORKOUT;
     }
     
     render() {
