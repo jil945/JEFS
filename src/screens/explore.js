@@ -47,7 +47,7 @@ export default class Explore extends React.Component {
         const headerHeight = Platform.OS === "android" ? 100 + StatusBar.currentHeight : 80;
         return (
             <SafeAreaView style={{ flex: 1 }}>
-                <SearchBar placeholder={"Search for meals or workouts"}
+                <SearchBar placeholder={"Search for meals"}
                     inputStyle={{ color: "black" }}
                     lightTheme
                     value={this.state.query}
@@ -55,25 +55,6 @@ export default class Explore extends React.Component {
                     onClear={this._onClearSearch}></SearchBar>
 
                 <ScrollView scrollEventThrottle={16}>
-                    <View style={{ flex: 1, backgroundColor: "white", paddingTop: 20 }}>
-                        <Text style={{ fontSize: 24, fontWeight: "700", paddingHorizontal: 20 }}>
-                            Select 10 from the collection of Meals
-                        </Text>
-                        <View style={{ paddingHorizontal: 20, marginTop: 20, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
-                            <ScrollView horizontal
-                                showsHorizontalScrollIndicator={false}>
-                                <TouchableOpacity onPress={this._viewMeal}>
-                                    <Recommendations width={width} meal="Orange Chicken - 473 calories" time="10 Minutes" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={this._viewMeal}>
-                                    <Recommendations width={width} meal="Chocolate Chip Cookie - 100 calories" time="20 Minutes" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={this._viewMeal}>
-                                    <Recommendations width={width} meal="Chicken fingers - 200 calories" time="20 Minutes" />
-                                </TouchableOpacity>
-                            </ScrollView>
-                        </View>
-                    </View>
                     <View style={{ marginTop: 40 }}>
                         <Text style={{ fontSize: 24, fontWeight: "700", paddingHorizontal: 20 }}>
                             Explore our Suggested Meals for Today
