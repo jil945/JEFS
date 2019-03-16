@@ -1,6 +1,6 @@
 import React from "react";
 import { AsyncStorage } from "react-native";
-import { AppAuth } from "expo-app-auth";
+import { AppAuth } from "expo";
 import axios from "axios";
 
 import http from "./http";
@@ -52,6 +52,8 @@ const Auth = {
         try {
             let auth = JSON.parse(await AsyncStorage.getItem(GOOGLE_AUTH_STATE));
             if (auth && this.isExpired(auth)) {
+                // Currently broken in IOS
+                // Fix in master branch https://github.com/expo/expo/pull/3263
                 auth = await AppAuth.refreshAsync(GOOGLE_CONFIG, auth.refreshToken);
                 await this.setAuthState(auth);
             }
