@@ -44,7 +44,7 @@ const PedometerTask = {
             let start = new Date();
             start.setHours(0, 0, 0, 0);
             let { steps } = await Pedometer.getStepCountAsync(start, end);
-            this.count = steps;
+            this.handleTask({ steps });
 
             Pedometer.watchStepCount(({steps}) => {
                 this.handleTask({ steps });
