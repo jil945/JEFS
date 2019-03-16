@@ -3,7 +3,6 @@ import { View, Text, SafeAreaView, TouchableOpacity, Platform, StatusBar, Scroll
 import Icon from "react-native-vector-icons/Ionicons";
 import { SearchBar } from "react-native-elements";
 
-import Category from "./components/explore/category";
 import Recommendations from "./components/explore/recommendations";
 
 import { GET_WORKOUT, GET_RECIPIE } from "../util/http";
@@ -58,15 +57,20 @@ export default class Explore extends React.Component {
                 <ScrollView scrollEventThrottle={16}>
                     <View style={{ flex: 1, backgroundColor: "white", paddingTop: 20 }}>
                         <Text style={{ fontSize: 24, fontWeight: "700", paddingHorizontal: 20 }}>
-                            Explore from the collection of Exercises and Meals
+                            Select 10 from the collection of Meals
                         </Text>
-                        <View style={{ height: 130, marginTop: 20 }}>
+                        <View style={{ paddingHorizontal: 20, marginTop: 20, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
                             <ScrollView horizontal
                                 showsHorizontalScrollIndicator={false}>
-                                <Category imageUri={require("../../assets/food.jpg")}
-                                    name="Meals" />
-                                <Category imageUri={require("../../assets/exercise.jpg")}
-                                    name="Exercises" />
+                                <TouchableOpacity onPress={this._viewMeal}>
+                                    <Recommendations width={width} meal="Orange Chicken - 473 calories" time="10 Minutes" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this._viewMeal}>
+                                    <Recommendations width={width} meal="Chocolate Chip Cookie - 100 calories" time="20 Minutes" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this._viewMeal}>
+                                    <Recommendations width={width} meal="Chicken fingers - 200 calories" time="20 Minutes" />
+                                </TouchableOpacity>
                             </ScrollView>
                         </View>
                     </View>

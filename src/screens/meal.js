@@ -6,9 +6,9 @@ const { height, width } = Dimensions.get("window");
 const BG_COLOR = "#cfdef7";
 const ICON_SIZE = 40;
 const s = StyleSheet.create({
-    header: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#eae5e5", backgroundColor: BG_COLOR },
-    left: { flex: 1, alignItems: "flex-start", marginLeft: 16 },
-    center: { flex: 1, flexDirection: "row", alignItems: "center", fontSize: 24, fontWeight: "700" },
+    header: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", borderBottomWidth: 1, borderBottomColor: "#eae5e5", backgroundColor: BG_COLOR },
+    left: { flex: 1, marginLeft: 16},
+    center: { flex: 1, fontSize: 24, fontWeight: "700" },
     right: { flex: 1, alignItems: "center" }
 });
 const MEAL = {
@@ -56,11 +56,11 @@ export default class Meal extends React.Component {
                         <Icon name="ios-arrow-back" size={ICON_SIZE}></Icon>
                     </TouchableHighlight>
                     <Text style={s.center}>
-                        Meal Title
+                        {MEAL.title}
                     </Text>
                 </View>
                 <View style={{ marginTop: 40, paddingHorizontal: 20 }}>
-                    <Text style={{ fontSize: 24, fontWeight: "700" }}>Meal Title</Text>
+                    <Text style={{ fontSize: 24, fontWeight: "700" }}>{MEAL.title}</Text>
                     <View style={{ width: width - 40, height: 200, marginTop: 20 }}>
                         <Image style={{
                             flex: 1, height: null, width: null, resizeMode: "cover",
