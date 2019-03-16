@@ -14,6 +14,7 @@ import Settings from "./settings";
 import Login from "./login";
 
 import Profile from "./profile";
+import Meal from "./meal";
 
 const MainStack = createBottomTabNavigator({
     Day: Day,
@@ -29,10 +30,14 @@ const LoginStack = createStackNavigator({
 const ProfileStack = createStackNavigator({
     Profile: Profile
 });
+const MealStack = createStackNavigator({
+    Meal: Meal
+});
 const AppContainer = createAppContainer(createSwitchNavigator(
     { 
         Main: MainStack,
         Profile: ProfileStack,
+        Meal: MealStack,
         Login: LoginStack
     }, {
         initialRouteName: "Login"

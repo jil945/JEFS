@@ -11,7 +11,6 @@ export default class Recommendations extends React.Component {
         this.setState(prevState => ({isLiked: !prevState.isLiked}));
         //update state or database
     }
-    
     render() {
         return (
             <View style={{width: this.props.width/2 - 30, height: this.props.width/2 - 30, borderWidth:0.5, borderColor:"#dddddd"}}>
