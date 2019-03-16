@@ -32,7 +32,7 @@ export default class Goal extends React.Component {
                             fontSize: 10,
                         }}
                         numberOfTicks={ 10 }
-                        formatLabel={ value => `${value}lb` }
+                        formatLabel={ value => value }
                     />
                     <LineChart
                         style={{ flex: 1, marginLeft: 16 }}
@@ -43,7 +43,7 @@ export default class Goal extends React.Component {
                         <Grid/>
                     </LineChart>
                 </View>
-                <Button title="Update Your Weight" style = {{borderRadius:10, justifyContent: "center", alignItems: "center"}} onPress={this._updateWeight}></Button>
+                <Button title="Update Your Weight" style = {{borderRadius:30, justifyContent: "center", alignItems: "center"}} onPress={this._updateWeight}></Button>
             </SafeAreaView>
         );
     }
