@@ -38,6 +38,15 @@ export default class Login extends React.Component {
         };
     }
 
+    componentDidMount = async () => {
+        try {
+            if (await Auth.trySigningIn()) {
+                let _t = this;
+                setTimeout(() => _t._next());
+            }
+        } catch(e){}
+    }
+
     _signIn = async () => {
         try {
             this.setState({ loading: true });
@@ -114,7 +123,6 @@ export default class Login extends React.Component {
         };
         
         let resp = await Auth.createUserProfileAsync(profile);
-        // console.log(resp.data);
         if (resp.status === 200 || resp.status === 201) {
             this._mainPage();
         }
@@ -164,7 +172,7 @@ export default class Login extends React.Component {
     cuisinePicker() {
         const cuisineOptions = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle", "eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "european", "caribbean", "latin"];
 
-        return cuisineOptions.map(c => {
+        let cuisineCheckBoxes = cuisineOptions.map(c => {
             let capitalized = c.charAt(0).toUpperCase() + c.slice(1);
             let pressed = () => this.setState(state => {
                 if (state.cuisineTypes.has(c)) {
@@ -181,14 +189,13 @@ export default class Login extends React.Component {
                     onPress={pressed}></CheckBox>
             );
         });
-    }
 
-    componentWillMount = async () => {
-        try {
-            if (await Auth.trySigningIn()) {
-                this._next();
-            }
-        } catch(e){}
+        return (
+            <View>
+                <Text style={{ color: "gray", fontSize: 20 }}>Preferred Cuisines (Select at least 2)</Text>
+                { cuisineCheckBoxes }
+            </View>
+        );
     }
 
     render() {
@@ -207,6 +214,12 @@ export default class Login extends React.Component {
                                 <View style={{ alignItems: "center", justifyContent: "center" }}>
                                     <Avatar source={{ uri: this.state.profile.picture }}></Avatar>
                                 </View>
+                                <Input label="Name"
+                                    value={this.state.profile.name}
+                                    onChangeText={(text) => this.setState(state => {
+                                        state.profile.name = text;
+                                        return state;
+                                    })}></Input>
                                 <Input label="Age" 
                                     keyboardType="number-pad"
                                     onChangeText={(text) => this.setState(state => {
@@ -241,8 +254,14 @@ export default class Login extends React.Component {
                             </View>
                         </ScrollView>
                     ) : (
-                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
-                            <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>
+                        <View style={{ flex: 1, alignItems: "center", justifyContent: "flex-start"}}>
+                            <View style={_s.container}>
+                                <Text h4 >Just Enjoy Out Food Suggestions</Text>
+                                <Text h4>(JEFS)</Text>
+                            </View>
+                            <View style={{ flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
+                                <GoogleSignInButton onPress={this._signIn} disabled={this.state.loading}></GoogleSignInButton>
+                            </View>
                         </View>
                     )}
                 </View>
