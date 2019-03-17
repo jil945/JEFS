@@ -15,7 +15,9 @@ import RNPickerSelect from "react-native-picker-select";
 import Auth from "../util/auth";
 import _s from "../styles";
 import { Tasks } from "../util/tasks";
+import RecipeCard from "./components/explore/RecipeCard";
 import GoogleSignInButton from "./components/GoogleSignInButton";
+import http, { httpRecipe }  from "../util/http";
 
 export default class Login extends React.Component {
     static navigationOptions = {
@@ -33,6 +35,9 @@ export default class Login extends React.Component {
         this.state = {
             loading: false,
             newProfile: false,
+            newProfileIdx: 0,
+            recRecipe: [],
+            likedRecipe: new Set(),
             profile: {},
             cuisineTypes: new Set()
         };
@@ -101,6 +106,11 @@ export default class Login extends React.Component {
             return false;
         }
 
+        // Check liked recipes is not empty
+        if (this.state.likedRecipe.size < 10) {
+            return false;
+        }
+
         return true;
     }
 
@@ -114,6 +124,7 @@ export default class Login extends React.Component {
         this.state.cuisineTypes.forEach(c => cuisine.push(c));
 
         // Calculate BMI goal
+        // Pretty sure my calculation is off
         let bmigoal = this.state.profile.targetWeight / Math.pow(this.state.profile.height, 2);
 
         let profile = {
@@ -123,9 +134,19 @@ export default class Login extends React.Component {
         };
         
         let resp = await Auth.createUserProfileAsync(profile);
-        if (resp.status === 200 || resp.status === 201) {
-            this._mainPage();
+        if (resp.status !== 200 || resp.status !== 201) {
+            return;
         }
+
+        // Send liked recipes
+        let recipeList = [];
+        this.state.likedRecipe.forEach(c => recipeList.push(c));
+        resp = await Promise.all(recipeList.map(id => {
+            return http.put(`recipe/${id}/like`)
+                .catch(console.log);
+        }));
+
+        this._mainPage();
     }
 
     _mainPage = () => {
@@ -198,6 +219,125 @@ export default class Login extends React.Component {
         );
     }
 
+    _toggleNewProfile = async (idx) => {
+        if (idx !== 0) {
+            // fecth recipe
+
+            // check that greater than 2
+            if  (this.state.cuisineTypes.size < 2) {
+                return;
+            }
+            if (this.state.recRecipe.length <= 0) {
+                let cuisine = [];
+                this.state.cuisineTypes.forEach(c => cuisine.push(c));
+                let recRecipe = [];
+                await Promise.all(
+                    cuisine.map(c => {
+                        return httpRecipe.get("recipes/random", {
+                            params: {
+                                number: 10,
+                                tags: c
+                            }
+                        }).then(resp => {
+                            let recipes = resp.data.recipes;
+                            recipes.forEach(r => recRecipe.push(r));
+                        })
+                            .catch(console.log);
+                    })
+                );
+    
+                this.setState({ recRecipe });
+            }
+        }
+
+        this.setState({ newProfileIdx: idx });
+    }
+
+    _renderNewProfile = () => {
+        return (
+            <View style={{ padding: 20 }}>
+                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                    <Avatar source={{ uri: this.state.profile.picture }}></Avatar>
+                </View>
+                <Input label="Name"
+                    value={this.state.profile.name}
+                    onChangeText={(text) => this.setState(state => {
+                        state.profile.name = text;
+                        return state;
+                    })}></Input>
+                <Input label="Age" 
+                    keyboardType="number-pad"
+                    onChangeText={(text) => this.setState(state => {
+                        state.profile.age = parseInt(text);
+                        return state;
+                    })}></Input>
+                { this.genderPicker() }
+                <Input label="Height (cm)" 
+                    keyboardType="numeric"
+                    onChangeText={(text) => this.setState(state => {
+                        state.profile.height = parseFloat(text);
+                        return state;
+                    })}></Input>
+                <Input label="Weight (kg)" 
+                    keyboardType="numeric"
+                    onChangeText={(text) => this.setState(state => {
+                        state.profile.weight = parseFloat(text);
+                        return state;
+                    })}></Input>
+                <Input label="Target Weight (kg)"
+                    keyboardType="numeric"
+                    onChangeText={(text) => this.setState(state => {
+                        state.profile.targetWeight = parseFloat(text);
+                        return state;
+                    })}></Input>
+                { this.cuisinePicker() }
+                <Button style={{ paddingVertical: 12 }}
+                    title="Select Recipes" 
+                    onPress={() => this._toggleNewProfile(1)}></Button>
+            </View>
+        );
+    }
+
+    _renderRecipeSelection = () => {
+
+        let recipeList = this.state.recRecipe.map(recipe => {
+            let id = recipe.id;
+            let pressed = () => this.setState(state => {
+                if (state.likedRecipe.has(id)) {
+                    state.likedRecipe.delete(id);
+                } else {
+                    state.likedRecipe.add(id);
+                }
+                return state;
+            });
+
+            return (
+                <RecipeCard key={id} 
+                    item={recipe}
+                    like={this.state.likedRecipe.has(id)}
+                    onPress={pressed}
+                    onLike={pressed}></RecipeCard>
+            );
+        });
+
+        return (
+            <View style={{ flex: 1, paddingTop: 20 }}>
+                <Text style={{ fontSize: 24, fontWeight: "700", paddingHorizontal: 20 }}>
+                    Select 10 from the collection of Meals
+                </Text>
+                <View style={{ paddingHorizontal: 20, marginTop: 20, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+                    { recipeList }
+                    <Button style={{ paddingVertical: 12 }}
+                        title="Change Preferences" 
+                        onPress={() => this._toggleNewProfile(0)}></Button>
+                    <Button style={{ paddingVertical: 12 }}
+                        title="Submit Profile" 
+                        onPress={this._submit}></Button>
+                </View>
+            </View>
+        );
+    }
+
     render() {
         return (
             <SafeAreaView style={{ flex: 1 }}>
@@ -210,48 +350,8 @@ export default class Login extends React.Component {
                         <ActivityIndicator></ActivityIndicator>
                     ) : this.state.newProfile ? (
                         <ScrollView>
-                            <View style={{ padding: 20 }}>
-                                <View style={{ alignItems: "center", justifyContent: "center" }}>
-                                    <Avatar source={{ uri: this.state.profile.picture }}></Avatar>
-                                </View>
-                                <Input label="Name"
-                                    value={this.state.profile.name}
-                                    onChangeText={(text) => this.setState(state => {
-                                        state.profile.name = text;
-                                        return state;
-                                    })}></Input>
-                                <Input label="Age" 
-                                    keyboardType="number-pad"
-                                    onChangeText={(text) => this.setState(state => {
-                                        state.profile.age = parseInt(text);
-                                        return state;
-                                    })}></Input>
-                                { this.genderPicker() }
-                                <Input label="Height (cm)" 
-                                    keyboardType="numeric"
-                                    onChangeText={(text) => this.setState(state => {
-                                        state.profile.height = parseFloat(text);
-                                        return state;
-                                    })}></Input>
-                                <Input label="Weight (kg)" 
-                                    keyboardType="numeric"
-                                    onChangeText={(text) => this.setState(state => {
-                                        state.profile.weight = parseFloat(text);
-                                        return state;
-                                    })}></Input>
-                                <Input label="Target Weight (kg)"
-                                    keyboardType="numeric"
-                                    onChangeText={(text) => this.setState(state => {
-                                        state.profile.targetWeight = parseFloat(text);
-                                        return state;
-                                    })}></Input>
-                                { this.cuisinePicker() }
-                                <Button style={{ paddingVertical: 12 }}
-                                    title="Submit" 
-                                    onPress={this._submit}></Button>
-                                { __DEV__  && <Button style={{ padding: 12 }} title="Main Page" onPress={this._mainPage}></Button> }
-
-                            </View>
+                            { this.state.newProfileIdx === 0 ? this._renderNewProfile() : this._renderRecipeSelection() }
+                            { __DEV__  && <Button style={{ padding: 12 }} title="Main Page" onPress={this._mainPage}></Button> }
                         </ScrollView>
                     ) : (
                         <View style={{ flex: 1, alignItems: "center", justifyContent: "flex-start"}}>
