@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { SearchBar } from "react-native-elements";
 
 import RecipeCard from "./components/explore/RecipeCard";
+import RecipeModal from "./components/explore/RecipeModal";
 import http, { WEEKDAYS } from "../util/http";
 
 export default class Explore extends React.Component {
@@ -25,6 +26,8 @@ export default class Explore extends React.Component {
         this.state = {
             query: "",
             like: new Set(), // TODO remove
+            isModalVisible: false,
+            modalRecipe: {},
             recRecipe: [],
         };
     }
@@ -57,8 +60,7 @@ export default class Explore extends React.Component {
     }
 
     _viewRecipe = (recipe) => {
-        console.log(this.state);
-        this.props.navigation.navigate("Meal");
+        this.setState({ modalRecipe: recipe, isModalVisible: true });
     }
 
     _viewMeal = () => {
@@ -94,6 +96,9 @@ export default class Explore extends React.Component {
     render() {
         return (
             <SafeAreaView style={{ flex: 1 }}>
+                <RecipeModal item={this.state.modalRecipe}
+                    isVisible={this.state.isModalVisible} 
+                    closeModal={() => this.setState({ isModalVisible: false })}></RecipeModal>
                 <SearchBar placeholder={"Search for meals"}
                     inputStyle={{ color: "black" }}
                     lightTheme
