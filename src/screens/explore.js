@@ -3,9 +3,9 @@ import { View, Text, SafeAreaView, TouchableOpacity, Platform, StatusBar, Scroll
 import Icon from "react-native-vector-icons/Ionicons";
 import { SearchBar } from "react-native-elements";
 
-import Recommendations from "./components/explore/recommendations";
+import RecipeCard from "./components/explore/RecipeCard";
 
-import { GET_WORKOUT, GET_RECIPIE } from "../util/http";
+import http from "../util/http";
 
 const { width } = Dimensions.get("window");
 
@@ -20,6 +20,7 @@ export default class Explore extends React.Component {
         super(props);
         this.state = {
             query: "",
+            like: new Set(),
         };
     }
 
@@ -35,12 +36,26 @@ export default class Explore extends React.Component {
             return state;
         });
     }
+    _onLike = (val, id) => {
+        let hasId = this.state.like.has(id);
+        if (val && !hasId) {
+            this.setState(state => {
+                state.like.add(id);
+                return state;
+            });
+        } else if (!val && hasId) {
+            this.setState(state => {
+                state.like.delete(id);
+                return state;
+            });
+        }
+    }
     _viewMeal = () => {
         this.props.navigation.navigate("Meal");
     }
-    componentWillMount = async () => {
-        let recipie = await GET_RECIPIE;
-        let workout = await GET_WORKOUT;
+    componentDidMount = async () => {
+        let resp = await http.get("recommendations/recipes");
+        let recRecipe = resp.data;
     }
 
     render() {
@@ -62,15 +77,18 @@ export default class Explore extends React.Component {
                         <View style={{ paddingHorizontal: 20, marginTop: 20, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
                             <ScrollView horizontal
                                 showsHorizontalScrollIndicator={false}>
-                                <TouchableOpacity onPress={this._viewMeal}>
-                                    <Recommendations width={width} meal="Orange Chicken - 473 calories" time="10 Minutes" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={this._viewMeal}>
-                                    <Recommendations width={width} meal="Chocolate Chip Cookie - 100 calories" time="20 Minutes" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={this._viewMeal}>
-                                    <Recommendations width={width} meal="Chicken fingers - 200 calories" time="20 Minutes" />
-                                </TouchableOpacity>
+                                <RecipeCard item={{ title: "Chicken fingers - 200 calories" }}
+                                    onPress={this._viewMeal}
+                                    like={this.state.like.has(1)}
+                                    onLike={(val) => this._onLike(val, 1)}></RecipeCard>
+                                <RecipeCard item={{ title: "Chicken fingers - 200 calories" }}
+                                    onPress={this._viewMeal}
+                                    like={this.state.like.has(2)}
+                                    onLike={(val) => this._onLike(val, 2)}></RecipeCard>
+                                <RecipeCard item={{ title: "Chicken fingers - 200 calories" }}
+                                    onPress={this._viewMeal}
+                                    like={this.state.like.has(3)}
+                                    onLike={(val) => this._onLike(val, 3)}></RecipeCard>
                             </ScrollView>
                         </View>
                     </View>
@@ -79,15 +97,18 @@ export default class Explore extends React.Component {
                             Explore our Suggested Meals for Today
                         </Text>
                         <View style={{ paddingHorizontal: 20, marginTop: 20, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
-                            <TouchableOpacity onPress={this._viewMeal}>
-                                <Recommendations width={width} meal="Orange Chicken - 473 calories" time="10 Minutes" />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={this._viewMeal}>
-                                <Recommendations width={width} meal="Chocolate Chip Cookie - 100 calories" time="20 Minutes" />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={this._viewMeal}>
-                                <Recommendations width={width} meal="Chicken fingers - 200 calories" time="20 Minutes" />
-                            </TouchableOpacity>
+                            <RecipeCard item={{ title: "Chicken fingers - 200 calories" }}
+                                onPress={this._viewMeal}
+                                like={this.state.like.has(4)}
+                                onLike={(val) => this._onLike(val, 4)}></RecipeCard>
+                            <RecipeCard item={{ title: "Chicken fingers - 200 calories" }}
+                                onPress={this._viewMeal}
+                                like={this.state.like.has(5)}
+                                onLike={(val) => this._onLike(val, 5)}></RecipeCard>
+                            <RecipeCard item={{ title: "Chicken fingers - 200 calories" }}
+                                onPress={this._viewMeal}
+                                like={this.state.like.has(6)}
+                                onLike={(val) => this._onLike(val, 6)}></RecipeCard>
                         </View>
                     </View>
                 </ScrollView>

@@ -76,6 +76,7 @@ export default class Meal extends React.Component {
                 }}>
                     <FlatList
                         data={MEAL.ingredients}
+                        keyExtractor={(item) => item}
                         renderItem={({ item }) => <Text style={{
                             padding: 20,
                             fontSize: 18,
