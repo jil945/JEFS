@@ -62,7 +62,7 @@ export default class Explore extends React.Component {
         const headerHeight = Platform.OS === "android" ? 100 + StatusBar.currentHeight : 80;
         return (
             <SafeAreaView style={{ flex: 1 }}>
-                <SearchBar placeholder={"Search for meals or workouts"}
+                <SearchBar placeholder={"Search for meals"}
                     inputStyle={{ color: "black" }}
                     lightTheme
                     value={this.state.query}
