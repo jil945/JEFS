@@ -1,6 +1,7 @@
 import React from "react";
 import { Location, TaskManager, Permissions, Pedometer } from "expo";
 import http from "./http";
+import DB from "./db";
 
 const LocationTask = {
     name: "@JEFS:LocationTask",
@@ -11,7 +12,7 @@ const LocationTask = {
                 await Permissions.askAsync(Permissions.LOCATION);
                 Location.startLocationUpdatesAsync(this.name, { accuracy: Location.Accuracy.Balanced, distanceInterval: 5 });
             } catch(e) {
-                console.log(this.name);
+                console.log(e);
             }
         }
 
@@ -52,6 +53,10 @@ const PedometerTask = {
         }
     },
 
+    async storeSteps(date, steps) {
+        await DB.insert(date, { stepcount: steps });
+    },
+
     handleTask({ steps }) {
         this.count += steps;
         let now = new Date();
@@ -67,6 +72,8 @@ const PedometerTask = {
                 })
                 .catch(console.log); // no-op
             
+            // store steps in local storage
+            this.storeSteps(now, this.count);
         }
     },
 
@@ -79,24 +86,38 @@ const PedometerTask = {
             steps: 0
         });
 
-        let day = new Date(currDate);
-        day.setHours(23, 59, 59, 999);
-
         if (await Pedometer.isAvailableAsync()) {
             await Promise.all(weeklySteps.map((_, idx) => {
-                let end = new Date(day);
-                let start = new Date(day);
-                start.setDate(start.getDate() - 1);
 
-                day = start;
-
-                return Pedometer.getStepCountAsync(start, end)
-                    .then(({ steps }) => {
-                        weeklySteps[idx] = {steps, day: end};
+                let day = new Date(currDate);
+                day.setDate(day.getDate() - idx);
+                return this.getSteps(day)
+                    .then(steps => {
+                        weeklySteps[idx] = { steps, day };
                     });
             }));
         }
         return weeklySteps;
+    },
+
+    async getSteps(currDate) {
+        // Check local DB first
+        let localDB = await DB.query(currDate);
+        if (localDB && localDB.stepcount) {
+            return localDB.stepcount;
+        }
+
+        let end = new Date(currDate);
+        end.setHours(23, 59, 59, 999);
+        let start = new Date(end);
+        start.setDate(start.getDate() - 1);
+
+        try {
+            let { steps } = await Pedometer.getStepCountAsync(start, end);
+            await this.storeSteps(currDate, steps);
+            return steps;
+        } catch(e) {}
+        return 0;
     }
 };
 
