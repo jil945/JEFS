@@ -7,6 +7,7 @@ import { SearchBar } from "react-native-elements";
 import RecipeCard from "./components/explore/RecipeCard";
 import RecipeModal from "./components/explore/RecipeModal";
 import http, { WEEKDAYS } from "../util/http";
+import RecipeInfo from "../util/recipeInfo";
 
 export default class Explore extends React.Component {
     static navigationOptions = {
@@ -63,15 +64,10 @@ export default class Explore extends React.Component {
         this.setState({ modalRecipe: recipe, isModalVisible: true });
     }
 
-    _viewMeal = () => {
-        this.props.navigation.navigate("Meal");
-    }
     componentDidMount = async () => {
         if (this.state.recRecipe.length <= 0) {
             try {
-                let resp = await http.get("recommendations/recipes");
-                let day = (new Date()).getDay();
-                let dailyRec = resp.data.result[WEEKDAYS[day]];
+                let dailyRec = await RecipeInfo.getRecommendation();
                 let recRecipe = Object.values(dailyRec);
                 this.setState({ recRecipe });
             } catch(e) {

@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Text } from "react-native-elements";
+import { Text, Button } from "react-native-elements";
 import {  ActivityIndicator, ViewPropTypes, View, FlatList, Image, ImageBackground, TouchableHighlight, StyleSheet, SafeAreaView } from "react-native";
 import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/Ionicons";
-import { httpRecipe } from "../../../util/http";
+import RecipeInfo from "../../../util/recipeInfo";
 
 export default class RecipeModal extends React.Component {
     static propTypes = {
@@ -28,7 +28,6 @@ export default class RecipeModal extends React.Component {
             item: {
                 ingredients: [],
             },
-            cache: {},
             loadingId: null,
         };
     }
@@ -39,22 +38,10 @@ export default class RecipeModal extends React.Component {
             return;
         }
 
-        if (id in this.state.cache) {
-            this.setState(state => {
-                state.item = state.cache[id];
-                return state;
-            });
-        }
-
         try {
-            let resp = await httpRecipe.get(`recipes/${id}/information`, {
-                params: {
-                    includeNutrition: true
-                }
-            });
+            let recipe = await RecipeInfo.fetchRecipe(id);
             this.setState(state => {
-                state.item = resp.data;
-                state.cache[id] = resp.data; // cache for later usage
+                state.item = recipe;
                 return state;
             });
         } catch(e) {
@@ -67,9 +54,22 @@ export default class RecipeModal extends React.Component {
         }
     }
 
+    _consumeRecipe = async () => {
+        await RecipeInfo.consumeRecipe(this.state.item.id);
+    }
+
     _onModalShow = () => {
-        this.setState({ loadingId: this.props.item.id });
-        this._fetchRecipe();
+        let id = this.props.item.id;
+        this.setState({ loadingId: id });
+
+        if (id && RecipeInfo.hasCache(id)) {
+            this.setState(state => {
+                state.item = RecipeInfo.getCache(id);
+                return state;
+            });
+        } else {
+            this._fetchRecipe();
+        }
     }
 
     _renderRecipe = () => {
@@ -98,6 +98,7 @@ export default class RecipeModal extends React.Component {
                             })
                         }
                     </View>
+                    <Button title={"Eat"} onPress={this._consumeRecipe}></Button>
                 </View>
             </View>
         );

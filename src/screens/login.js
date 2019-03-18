@@ -18,6 +18,7 @@ import { Tasks } from "../util/tasks";
 import RecipeCard from "./components/explore/RecipeCard";
 import GoogleSignInButton from "./components/GoogleSignInButton";
 import http, { httpRecipe }  from "../util/http";
+import RecipeInfo from "../util/recipeInfo";
 
 export default class Login extends React.Component {
     static navigationOptions = {
@@ -66,6 +67,7 @@ export default class Login extends React.Component {
     _next = async () => {
         
         await Tasks.init();
+        await RecipeInfo.initFillLikes();
         let profile = await Auth.getUserProfileAsync();
         // console.log(profile);
         this.setState({ profile });
@@ -141,10 +143,9 @@ export default class Login extends React.Component {
         // Send liked recipes
         let recipeList = [];
         this.state.likedRecipe.forEach(c => recipeList.push(c));
-        resp = await Promise.all(recipeList.map(id => {
-            return http.put(`recipe/${id}/like`)
-                .catch(console.log);
-        }));
+        for (let id of recipeList) {
+            await RecipeInfo.likeRecipe(id);
+        }
 
         this._mainPage();
     }
