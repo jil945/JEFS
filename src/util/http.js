@@ -13,7 +13,7 @@ const httpRecipe = axios.create({
         "X-RapidAPI-Key": RECIPE_KEY
     }
 });
-const WEEKDAYS = ["sunday", "mondy", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 const http  = axios.create({
     baseURL: BASE_URL
