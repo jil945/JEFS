@@ -17,24 +17,30 @@ async function queryStorage(key) {
     return obj;
 }
 
-async function updateStorage(date, obj) {
+async function updateStorage(key, obj) {
     let origObj = {};
     try {
-        origObj = await queryStorage(date);
+        origObj = await queryStorage(key);
 
         // update orig object with new keys
         Object.keys(obj).forEach(k => {
-            console.log(date, k, obj[k]);
             origObj[k] = obj[k];
         });
 
         // put object back in db
-        let key = storageKey(date);
+        let sKey = storageKey(key);
         let objStr = JSON.stringify(origObj);
-        await AsyncStorage.setItem(key, objStr);
+        await AsyncStorage.setItem(sKey, objStr);
 
     } catch(e) {}
     return origObj;
+}
+
+async function clearStorage(key) {
+    let sKey = storageKey(key);
+    try {
+        await AsyncStorage.removeItem(sKey);
+    } catch(e) {}
 }
 
 
@@ -86,5 +92,5 @@ const DB = {
     }
 };
 
-export { queryStorage, updateStorage };
+export { queryStorage, updateStorage, clearStorage };
 export default DB;
