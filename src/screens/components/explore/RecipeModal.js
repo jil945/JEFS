@@ -40,6 +40,7 @@ export default class RecipeModal extends React.Component {
 
         try {
             let recipe = await RecipeInfo.fetchRecipe(id);
+            console.log(recipe.analyzedInstructions.steps);
             this.setState(state => {
                 state.item = recipe;
                 return state;
@@ -56,6 +57,7 @@ export default class RecipeModal extends React.Component {
 
     _consumeRecipe = async () => {
         await RecipeInfo.consumeRecipe(this.state.item.id);
+        this.props.closeModal();
     }
 
     _onModalShow = () => {
@@ -74,7 +76,7 @@ export default class RecipeModal extends React.Component {
 
     _renderRecipe = () => {
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: "space-between" }}>
                 <View style={{ height: 180 }}>
                     <ImageBackground style={{ flex: 1, width: null, height: null, resizeMode: "cover" }}
                         source={{ uri: this.state.item.image }}>
@@ -98,7 +100,21 @@ export default class RecipeModal extends React.Component {
                             })
                         }
                     </View>
-                    <Button title={"Eat"} onPress={this._consumeRecipe}></Button>
+                    <Text style={{ fontSize: 20, fontWeight: "700"}}>Instructions</Text>
+                    <View>
+                        {/* 
+                            this.state.item.analyzedInstructions.steps.map((o, idx) => {
+                                return (
+                                    <Text key={idx}>{o.step}</Text>
+                                );
+                            })
+                         */}
+                    </View>
+                </View>
+                <View>
+                    <Button title={"Eat"} 
+                        style={{ padding: 10 }}
+                        onPress={this._consumeRecipe}></Button>
                 </View>
             </View>
         );
