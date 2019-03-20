@@ -27,10 +27,9 @@ This should automatically prompt you to open the Expo Client app (Make sure your
     - [screens](https://github.com/jil945/JEFS/tree/master/src/screens) folder fo mostly the userInterface of every page as below
         - [day.js](https://github.com/jil945/JEFS/blob/master/src/screens/day.js) which has the interface of logging the state of the user as of today
         - [explore.js](https://github.com/jil945/JEFS/blob/master/src/screens/explore.js) which has the search screen to search for meals
-        - [goal.js](https://github.com/jil945/JEFS/blob/master/src/screens/goal.js) for showing the user's weight progress to the goal
+        - [goal.js](https://github.com/jil945/JEFS/blob/master/src/screens/goal.js) for showing/updating the user's weight progress to the goal
         - [index.js](https://github.com/jil945/JEFS/blob/master/src/screens/index.js) has setup of the main screen
         - [login.js](https://github.com/jil945/JEFS/blob/master/src/screens/login.js) for login screen
-        - [profile.js](https://github.com/jil945/JEFS/blob/master/src/screens/profile.js) to let the user update their weight to track the progress
         - [settings.js](https://github.com/jil945/JEFS/blob/master/src/screens/settings.js) for settings such as logging of
         - [components](https://github.com/jil945/JEFS/tree/master/src/screens/components) folder has the common repeated elements such as the header
     - [util](https://github.com/jil945/JEFS/tree/master/src/util) folder which has the utilities functions as below
