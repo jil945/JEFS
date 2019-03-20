@@ -9,6 +9,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 
 import Auth from "../util/auth";
+import DB, { queryStorage, updateStorage, clearStorage }  from "../util/db";
 import _s from "../styles";
 
 export default class Settings extends React.Component {
@@ -44,6 +45,22 @@ export default class Settings extends React.Component {
         this.props.navigation.navigate("Login");
     }
 
+    _devButtons = () => [{
+        title: "Query Today",
+        onPress: async () => {
+            let today = await DB.query(new Date());
+            console.log(today);
+        }
+    }]
+
+    _renderDevButtons = () => {
+        return this._devButtons().map((btn, i) => (
+            <Button key={btn.title} 
+                title={btn.title}
+                onPress={btn.onPress}></Button>
+        ));
+    }
+
     componentWillMount = async () => {
         try {
             let userInfo = await Auth.getUserInfo();
@@ -60,6 +77,7 @@ export default class Settings extends React.Component {
                     onPress={this._signOut}></Button>
                 <Button title="Clear cache"
                     onPress={this._clearCache}></Button>
+                { __DEV__ && this._renderDevButtons() }
             </SafeAreaView>
         );
     }
