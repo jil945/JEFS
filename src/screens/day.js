@@ -1,5 +1,5 @@
 import React from "react";
-import { View, SafeAreaView, Text, Button } from "react-native";
+import { View, SafeAreaView, Text, Button, ActivityIndicator } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { PieChart, StackedBarChart, XAxis } from "react-native-svg-charts";
 import PureChart from "react-native-pure-chart";
@@ -7,6 +7,7 @@ import DateHeader from "./components/DateHeader";
 
 import moment from "moment";
 import { PedometerTask } from "../util/tasks";
+import RecipeInfo from "../util/recipeInfo";
 
 const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -22,7 +23,8 @@ export default class Day extends React.Component {
         this.state = {
             activeIndex: 0,
             currentDate: new moment(),
-            tabState: {}
+            tabState: {},
+            loading: false
         };
     }
 
@@ -57,6 +59,8 @@ export default class Day extends React.Component {
     }
 
     _segmentClicked = async (index) => {
+        this.setState({ loading: true });
+
         let key = this._tabs()[index].key;
         let beforeFn = this._tabs()[index].before;
         if (beforeFn) {
@@ -64,17 +68,52 @@ export default class Day extends React.Component {
         }
 
         this.setState(state => {
+            state.loading = false;
             state.activeIndex = index;
             return state;
         });
     }
 
+
     _beforeRenderCalories = async (key) => {
         // Do data fetching here
+        let consumed = await RecipeInfo.queryConsumed(this.state.currentDate.toDate());
+
+        const threshold = 2100;
+
+        let barData = consumed.map(c => {
+            return {
+                day: WEEK[c.day.getDay()],
+                within: threshold > threshold ? 2100 : c.calories,
+                over: c.calories > threshold ? c.calories - threshold : 0
+            };
+        });
+
+        let curr = consumed[consumed.length - 1];
+        let over = curr.calories > threshold ? (curr.calories - threshold) / threshold : 0;
+        let under = curr.calories > threshold ? 0 : (threshold - curr.calories) / threshold;
+
+        let pieChart = [{
+            key: 1,
+            amount: over,
+            svg: { fill: "#f23a3a" }//calories beyond the calories budget
+        }, {
+            key: 2,
+            amount: curr.calories / threshold,
+            svg: { fill: "#558241" }//for the calories taken within calorie budget
+        }, {
+            key: 3,
+            amount: under,
+            svg: { fill: "white" }//for the empty space
+        }];
+
 
         // Store data needed for rendering
         this.setState(state => {
             state.tabState[key] = {
+                barData,
+                pieChart,
+                calories: curr.calories
             };
             return state;
         });
@@ -82,43 +121,23 @@ export default class Day extends React.Component {
 
     _renderCalories = (key) => {
         let t = this.state.tabState[key]; // Access data from beforeRender
+        const { barData, pieChart, calories } = t;
 
         const calColors = [ "#558241", "#f23a3a" ];
         const barKeys   = [ "within", "over" ];
 
-        const barData = [ {day: "Sunday",
-            within: 1400, over:0},{day: "Mon", within:2100, over:400},{day: "Tue",
-            within: 1400, over:0},{day: "Wed", within:2100, over:400},{day: "Thu",
-            within: 1400, over:0},{day: "Fri", within:2100, over:400},{day: "Sat", within:1000, over:200}];
-        const calories = [
-            {
-                key: 1,
-                amount: 80,//multiply percentage by the user's recommended calories per day
-                svg: { fill: "#558241" }//for the calories taken within calorie budget
-            },
-            {
-                key: 2,
-                amount: 0,
-                svg: { fill: "#f23a3a" }//calories beyond the calories budget
-            },
-            {
-                key: 3,
-                amount: 20,
-                svg: { fill: "white" }//for the empty space
-            }
-        ];
         return (
             <View style={{ flex: 1, marginTop: 20}}>
                 <PieChart
                     style={{ height: 200 }}
                     valueAccessor={({ item }) => item.amount}
-                    data={calories}
+                    data={pieChart}
                     spacing={0}
                     outerRadius={"95%"}>
                 </PieChart>
                 <Text style={{marginTop: -100, marginBottom: 100, 
                     justifyContent: "center", alignItems: "center", position: "relative", textAlign: "center" }}>
-                    {(calories[0].amount + calories[1].amount)*12} </Text>
+                    {calories} </Text>
                 <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
                     borderBottomColor: "#eae5e5", paddingTop:16}}>
                     <View style={{ width: 20, height: 20, borderRadius: 20/2, backgroundColor: "#558241"}} />
@@ -145,10 +164,38 @@ export default class Day extends React.Component {
 
     _beforeRenderNutrients = async (key) => {
         // Do data fetching here
+        let consumed = await RecipeInfo.queryConsumed(this.state.currentDate.toDate());
+
+        let barData = consumed.map(c => {
+            return {
+                day: WEEK[c.day.getDay()],
+                fat: c.fat,
+                carb: c.carbohydrates,
+                protein: c.protein
+            };
+        });
+
+        let curr = consumed[consumed.length - 1];
+        let pieData = [{
+            value: curr.fat,
+            label: "Fat",
+            color: "#dbce85",
+        }, {
+            value: curr.carbohydrates,
+            label: "Carb",
+            color: "#a1e0d6"
+        }, {
+            value: curr.protein,
+            label: "Protein",
+            color: "#786499"
+        }];
+
 
         // Store data needed for rendering
         this.setState(state => {
             state.tabState[key] = {
+                barData,
+                pieData
             };
             return state;
         });
@@ -156,69 +203,10 @@ export default class Day extends React.Component {
 
     _renderNutrients = (key) => {
         let t = this.state.tabState[key]; // Access data from beforeRender
-
-        const nutrientData = [
-            {
-                day: "Sun",
-                fat: 30,
-                carb: 50,
-                protein: 20
-            },
-            {
-                day: "Mon",
-                fat: 40,
-                carb: 40,
-                protein: 20
-            },
-            {
-                day: "Tue",
-                fat: 45,
-                carb: 45,
-                protein: 10
-            },
-            {
-                day: "Wed",
-                fat: 40,
-                carb: 50,
-                protein: 10
-            },
-            {
-                day: "Thu",
-                fat: 30,
-                carb: 50,
-                protein: 20
-            },
-            {
-                day: "Fri",
-                fat: 40,
-                carb: 40,
-                protein: 20
-            },
-            {
-                day: "Sat",
-                fat: 45,
-                carb: 45,
-                protein: 10
-            }
-        ];
+        const { barData, pieData } = t;
         const colors = [ "#dbce85", "#a1e0d6", "#786499" ];
         const keys   = [ "fat", "carb", "protein" ];
-        const pieData = [
-            {
-                value: 45,
-                label: "Fat",
-                color: "#dbce85",
-            }, {
-                value: 41,
-                label: "Carb",
-                color: "#a1e0d6"
-            }, {
-                value: 15,
-                label: "Protein",
-                color: "#786499"
-            }
 
-        ];
         return (
             <View style={{ flex: 1}}>
                 <View style={{justifyContent: "center", alignItems: "center", marginTop: 20}}>
@@ -238,12 +226,12 @@ export default class Day extends React.Component {
                         style={ { height: 200 } }
                         keys={ keys }
                         colors={ colors }
-                        data={ nutrientData }
+                        data={ barData }
                         showGrid={ false }
                         contentInset={ { top: 30, bottom: 30 } }
                     />
-                    <XAxis style={{ marginHorizontal: -10, height: 30 }} data={nutrientData} 
-                        xAccessor={({ index }) => index} formatLabel={(_,index) => nutrientData[ index ].day}
+                    <XAxis style={{ marginHorizontal: -10, height: 30 }} data={barData} 
+                        xAccessor={({ index }) => index} formatLabel={(_,index) => barData[ index ].day}
                         svg={{ fontSize: 10, fill: "black" }} contentInset={{ left: 30, right: 30 }} />
                 </View>
             </View>
@@ -344,6 +332,22 @@ export default class Day extends React.Component {
         );
     }
 
+    componentWillMount = async () => {
+        await this._segmentClicked(0);
+    }
+
+    _renderTab = () => {
+        if (this.state.loading) {
+            return (
+                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <ActivityIndicator></ActivityIndicator>
+                </View>
+            );
+        }
+        const t = this._tabs()[this.state.activeIndex];
+        return t.render(t.key);
+    }
+
     render() {
         const t = this._tabs()[this.state.activeIndex];
 
@@ -359,7 +363,7 @@ export default class Day extends React.Component {
                             onPress={() => this._segmentClicked(idx)}></Button>
                     ))}
                 </View>
-                { t.render(t.key) }
+                { this._renderTab() }
             </SafeAreaView>
         );
     }

@@ -1,6 +1,7 @@
 import { AsyncStorage } from "react-native";
 import DB, { queryStorage, updateStorage } from "./db";
 import http, { httpRecipe, WEEKDAYS } from "./http";
+import moment from "moment";
 
 const recipeKey = (id) => `recipe-${id}`;
 const likeKey = "liked-recipes";
@@ -50,66 +51,93 @@ const RecipeInfo = {
     },
 
     async likeRecipe(id) {
-        this._likes[id] = new Date();
-
         try {
-            await Promise.all([
-                updateStorage(likeKey, this._likes),
-                http.post(`recipe/${id}/like`)
-                    .catch(console.log)
-            ]);
-        } catch(e) {}
+            await http.post(`recipe/${id}/like`).catch();
+
+            this._likes[id] = new Date();
+            await updateStorage(likeKey, this._likes);
+        } catch(e) {
+            return false;
+        }
+        return true;
     },
 
     async consumeRecipe(id) {
-        let today = new Date();
+        let keyDate = new Date();
         try {
             await this.likeRecipe(id);
 
             let recipe = await this.fetchRecipe(id);
-            let nutrients = await DB.query(today, "nutrients"); // DO NOT changet this variable name
+            let today = await DB.query(keyDate);
 
-            if (!nutrients || !Array.isArray(nutrients)) {
-                nutrients = recipe.nutrition.nutrients;
-            } else {
-                recipe.nutrition.nutrients.forEach(n => {
-                    let idx = nutrients.find(x => x.title === n.title);
+            let fields = ["calories", "fat", "carbohydrates", "protein"];
+            fields.forEach(f => {
+                if (Number.isNaN(today[f])) {
+                    today[f] = 0;
+                }
+            });
 
-                    if (idx === -1) {
-                        nutrients.push(n);
-                    } else {
-                        nutrients[idx]["amount"] += n["amount"]; // TODO
-                        nutrients[idx]["percentOfDailyNeeds"] += n["percentOfDailyNeeds"];
-                    }
-                });
-            }
-            await DB.insert(today, { nutrients });
+            
+            recipe.nutrition.nutrients.forEach(nutrient => {
+                let { title, amount } = nutrient;
+                title = title.toLowerCase().replace(/\ /gi, "-");
 
+                if (Number.isNaN(today[title]) || !today[title]) {
+                    today[title] = 0;
+                }
 
-            let caloricBreakdown = await DB.query(today, "caloricBreakdown"); // DO NOT changet this variable name
-            let tempCalBreakdown = {};
-            let breakdown = recipe.nutrition.caloricBreakdown;
-            let cal = recipe.nutrition.nutrients.find(x => x.title.toLowerCase() === "calories");
-            let calAmt = cal.amount;
+                today[title] += Number.isNaN(amount) ? 0 : amount;
+            });
 
-            tempCalBreakdown["protein"] = ( breakdown["percentProtein"] / 100 ) * calAmt;
-            tempCalBreakdown["fat"]     = ( breakdown["percentFat"] / 100 ) * calAmt;
-            tempCalBreakdown["carbs"]   = ( breakdown["percentCarbs"] / 100 ) * calAmt;
-
-            if (!caloricBreakdown) {
-                caloricBreakdown = tempCalBreakdown;
-            } else {
-                caloricBreakdown["protein"] += tempCalBreakdown["protein"];
-                caloricBreakdown["fat"]     += tempCalBreakdown["fat"];
-                caloricBreakdown["carbs"]   += tempCalBreakdown["carbs"];
-            }
-
-            await DB.insert(today, { caloricBreakdown });
-
-
+            await DB.insert(keyDate, today);
         } catch(e) {
             console.log(e);
         }
+    },
+
+    async queryConsumed(currDate) {
+        let to = new moment(currDate);
+        let from  = new moment(currDate);
+        from = from.subtract(7, "days");
+
+        let res = [];
+        while (from.isSameOrBefore(to)) {
+            let frDate = from.toDate();
+            let { calories, fat, carbohydrates, protein } = await this.getConsumed(frDate);
+
+            let total = fat + carbohydrates + protein;
+            total = !total ? 1 : total;
+            
+            res.push({
+                day: frDate,
+                calories,
+                fat: (fat / total) * 100,
+                carbohydrates: (carbohydrates / total) * 100,
+                protein: (protein / total) * 100,
+            });
+
+            from.add(1, "days");
+        }
+        return res;
+    },
+
+    async getConsumed(currDate) {
+        let res = {};
+        const keys = ["calories", "fat", "carbohydrates", "protein"];
+        try {
+            let today = await DB.query(currDate);
+
+            keys.forEach(k => {
+                if (Number.isNaN(today[k]) || !today[k]) {
+                    res[k] = 0;
+                } else {
+                    res[k] = today[k];
+                }
+            });
+        } catch(e) {
+            console.log(e);
+        }
+        return res;
     },
 
     async getRecommendation() {
