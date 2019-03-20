@@ -5,6 +5,12 @@ import moment from "moment";
 
 const recipeKey = (id) => `recipe-${id}`;
 const likeKey = "liked-recipes";
+const consumeKey = (date) => {
+    let y = date.getFullYear();
+    let m = date.getMonth() + 1; // Month is off by 1
+    let d = date.getDate();
+    return `${y}-${m}-${d}`;
+};
 
 const RecipeInfo = {
     _cache: {},
@@ -70,23 +76,21 @@ const RecipeInfo = {
             let recipe = await this.fetchRecipe(id);
             let today = await DB.query(keyDate);
 
-            let fields = ["calories", "fat", "carbohydrates", "protein"];
-            fields.forEach(f => {
-                if (Number.isNaN(today[f])) {
-                    today[f] = 0;
-                }
-            });
+            let fields = new Set(["calories", "fat", "carbohydrates", "protein"]);
 
             
             recipe.nutrition.nutrients.forEach(nutrient => {
                 let { title, amount } = nutrient;
                 title = title.toLowerCase().replace(/\ /gi, "-");
 
-                if (Number.isNaN(today[title]) || !today[title]) {
-                    today[title] = 0;
+                if (fields.has(title)) {
+                    if (Number.isNaN(today[title]) || !today[title]) {
+                        today[title] = 0;
+                    }
+    
+                    today[title] += Number.isNaN(amount) ? 0 : amount;
                 }
 
-                today[title] += Number.isNaN(amount) ? 0 : amount;
             });
 
             await DB.insert(keyDate, today);
@@ -103,19 +107,23 @@ const RecipeInfo = {
         let res = [];
         while (from.isSameOrBefore(to)) {
             let frDate = from.toDate();
-            let { calories, fat, carbohydrates, protein } = await this.getConsumed(frDate);
+            let cacheKey = consumeKey(frDate);
 
-            let total = fat + carbohydrates + protein;
-            total = !total ? 1 : total;
-            
-            res.push({
-                day: frDate,
-                calories,
-                fat: (fat / total) * 100,
-                carbohydrates: (carbohydrates / total) * 100,
-                protein: (protein / total) * 100,
-            });
+            if (!this._cache.hasOwnProperty(cacheKey)) {
+                let { calories, fat, carbohydrates, protein } = await this.getConsumed(frDate);
+    
+                let total = fat + carbohydrates + protein;
+                total = !total ? 1 : total;
 
+                this._cache[cacheKey] = {
+                    day: frDate,
+                    calories,
+                    fat: (fat / total) * 100,
+                    carbohydrates: (carbohydrates / total) * 100,
+                    protein: (protein / total) * 100,
+                };
+            }
+            res.push(this._cache[cacheKey]);
             from.add(1, "days");
         }
         return res;
