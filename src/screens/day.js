@@ -137,7 +137,7 @@ export default class Day extends React.Component {
                 </PieChart>
                 <Text style={{marginTop: -100, marginBottom: 100, 
                     justifyContent: "center", alignItems: "center", position: "relative", textAlign: "center" }}>
-                    {calories} </Text>
+                    {parseInt(calories)} </Text>
                 <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
                     borderBottomColor: "#eae5e5", paddingTop:16}}>
                     <View style={{ width: 20, height: 20, borderRadius: 20/2, backgroundColor: "#558241"}} />
