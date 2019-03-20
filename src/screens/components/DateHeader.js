@@ -28,7 +28,12 @@ export default class DateHeader extends React.Component {
     }
 
     _incrementDate = () => {
-        let inc = this.props.value.add(1, "days");
+        let inc = new moment(this.props.value);
+        inc = inc.add(1, "days");
+        let today = new moment();
+        if (inc.isAfter(today, "day")) {
+            return;
+        }
         this.props.onChange(inc);
     }
     _decrementDate = () => {
