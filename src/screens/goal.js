@@ -104,7 +104,6 @@ export default class Goal extends React.Component {
 
     _getGraphData = () => {
         let to = new moment();
-        to.add(1, "days"); // need to offset it by one
         let from = new moment();
         from = from.subtract(7, "days");
 
@@ -112,7 +111,7 @@ export default class Goal extends React.Component {
         let profileWeights = this.state.profileWeights;
 
         let res = [];
-        while (from < to) {
+        while (from.isSameOrBefore(to)) {
             let k = from.format(DATE_FORMAT);
 
             if (profileWeights.hasOwnProperty(k)) {
@@ -209,11 +208,8 @@ export default class Goal extends React.Component {
                 <View style={{ height: 200, flexDirection: "row", marginLeft: 40 }}>
                     <YAxis
                         data={ data }
-                        contentInset={ { top: 20, bottom: 20 } }
-                        svg={{
-                            fill: "grey",
-                            fontSize: 10,
-                        }}
+                        contentInset={{ top: 20, bottom: 20 }}
+                        svg={{ fill: "grey", fontSize: 10 }}
                         numberOfTicks={ 10 }
                         formatLabel={ value => value }
                     />
