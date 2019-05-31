@@ -93,7 +93,7 @@ export default class Day extends React.Component {
         let over = curr.calories > threshold ? (curr.calories - threshold) / threshold : 0;
         let under = curr.calories > threshold ? 0 : (threshold - curr.calories) / threshold;
 
-        let pieChart = [{
+        let pieData = [{
             key: 1,
             amount: over,
             svg: { fill: "#f23a3a" }//calories beyond the calories budget
@@ -112,7 +112,7 @@ export default class Day extends React.Component {
         this.setState(state => {
             state.tabState[key] = {
                 barData,
-                pieChart,
+                pieData,
                 calories: curr.calories
             };
             return state;
@@ -121,7 +121,7 @@ export default class Day extends React.Component {
 
     _renderCalories = (key) => {
         let t = this.state.tabState[key]; // Access data from beforeRender
-        const { barData, pieChart, calories } = t;
+        const { barData, pieData, calories } = t;
 
         const calColors = [ "#558241", "#f23a3a" ];
         const barKeys   = [ "within", "over" ];
@@ -131,7 +131,7 @@ export default class Day extends React.Component {
                 <PieChart
                     style={{ height: 200 }}
                     valueAccessor={({ item }) => item.amount}
-                    data={pieChart}
+                    data={pieData}
                     spacing={0}
                     outerRadius={"95%"}>
                 </PieChart>
@@ -177,14 +177,17 @@ export default class Day extends React.Component {
 
         let curr = consumed[consumed.length - 1];
         let pieData = [{
+            key: 1,
             value: curr.fat,
             label: "Fat",
             color: "#dbce85",
         }, {
+            key: 2,
             value: curr.carbohydrates,
             label: "Carb",
             color: "#a1e0d6"
         }, {
+            key: 3,
             value: curr.protein,
             label: "Protein",
             color: "#786499"
@@ -207,10 +210,12 @@ export default class Day extends React.Component {
         const colors = [ "#dbce85", "#a1e0d6", "#786499" ];
         const keys   = [ "fat", "carb", "protein" ];
 
+        let showPie = pieData.reduce((a, c) => a + c.value, 0) > 0;
+
         return (
             <View style={{ flex: 1}}>
-                <View style={{justifyContent: "center", alignItems: "center", marginTop: 20}}>
-                    <PureChart data={pieData} type='pie' />
+                <View style={{justifyContent: "center", alignItems: "center", marginTop: 20, height: 200}}>
+                    { showPie && <PureChart data={pieData} type='pie' />} 
                 </View>
                 <View style={{flexDirection: "row", justifyContent:"space-around", borderBottomWidth:1,
                     borderBottomColor: "#eae5e5", marginTop:16}}>

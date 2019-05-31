@@ -1,4 +1,3 @@
-import { AsyncStorage } from "react-native";
 import DB, { queryStorage, updateStorage } from "./db";
 import http, { httpRecipe, WEEKDAYS } from "./http";
 import moment from "moment";
@@ -81,6 +80,7 @@ const RecipeInfo = {
             
             recipe.nutrition.nutrients.forEach(nutrient => {
                 let { title, amount } = nutrient;
+                // eslint-disable-next-line no-useless-escape
                 title = title.toLowerCase().replace(/\ /gi, "-");
 
                 if (fields.has(title)) {
@@ -107,23 +107,18 @@ const RecipeInfo = {
         let res = [];
         while (from.isSameOrBefore(to)) {
             let frDate = from.toDate();
-            let cacheKey = consumeKey(frDate);
+            let { calories, fat, carbohydrates, protein } = await this.getConsumed(frDate);
 
-            if (!this._cache.hasOwnProperty(cacheKey)) {
-                let { calories, fat, carbohydrates, protein } = await this.getConsumed(frDate);
-    
-                let total = fat + carbohydrates + protein;
-                total = !total ? 1 : total;
+            let total = fat + carbohydrates + protein;
+            total = !total ? 1 : total;
 
-                this._cache[cacheKey] = {
-                    day: frDate,
-                    calories,
-                    fat: (fat / total) * 100,
-                    carbohydrates: (carbohydrates / total) * 100,
-                    protein: (protein / total) * 100,
-                };
-            }
-            res.push(this._cache[cacheKey]);
+            res.push({
+                day: frDate,
+                calories,
+                fat: (fat / total) * 100,
+                carbohydrates: (carbohydrates / total) * 100,
+                protein: (protein / total) * 100,
+            });
             from.add(1, "days");
         }
         return res;
