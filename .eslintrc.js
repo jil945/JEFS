@@ -1,33 +1,33 @@
-{
-    "parser": "babel-eslint",
-    "env": {
-        "node": true,
-        "browser": true,
-        "es6": true
+module.export = {
+    parser: "babel-eslint",
+    env: {
+        node: true,
+        browser: true,
+        es6: true
     },
-    "extends": [
+    extends: [
         "eslint:recommended",
         "plugin:react/recommended"
     ],
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
+    parserOptions: {
+        ecmaFeatures: {
+            jsx: true
         },
-        "ecmaVersion": 2018,
-        "sourceType": "module"
+        ecmaVersion: 2018,
+        sourceType: "module"
     },
-    "plugins": [
+    plugins: [
         "react"
     ],
-    "settings": {
-        "react": {
-            "version": "detect"
+    settings: {
+        react: {
+            version: "detect"
         }
     },
-    "globals": {
+    globals: {
         "__DEV__": "readonly"
     },
-    "rules": {
+    rules: {
         "curly": ["error", "all"],
         "brace-style": ["error", "1tbs"],
         "no-unused-vars": ["warn", {"varsIgnorePattern": "^React$"}],
