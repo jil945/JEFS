@@ -8,7 +8,7 @@
     "prestart": "eslint --fix ."
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "expo": "^32.0.6",
     "install": "^0.12.2",
     "moment": "^2.24.0",
