@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "expo": "^32.0.6",
+    "expo": "^46.0.14",
     "install": "^0.12.2",
     "moment": "^2.24.0",
     "prop-types": "^15.7.2",
